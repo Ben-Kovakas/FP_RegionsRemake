@@ -146,3 +146,6 @@ From there:
 3. Change some text and save — watch it update instantly!
 
 
+Once you are developing, here is some helpful information:
+![File Structure](docs/fileStructure.png)
+![Branch Structure](docs/branchStructure.png)
