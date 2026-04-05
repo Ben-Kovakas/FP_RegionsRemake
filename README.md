@@ -16,7 +16,7 @@ npm install
 
 ## Step 2: Configure Android Studio
 
-> For a visual walkthrough, refer to the [official Expo setup guide](https://docs.expo.dev/get-started/set-up-your-environment/?platform=android&device=simulated).
+> PLEASE FOLLOW STEPS 1-4 ON THIS SITE! THE STUFF AFTER THIS MESSAGE ONLY SPECIFIES AFTER STEPS 1-4 ARE COMPLETED!!!! [official Expo setup guide](https://docs.expo.dev/get-started/set-up-your-environment/?platform=android&device=simulated).
 
 ### Phase 1: Find Your Android SDK Path
 
