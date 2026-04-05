@@ -1,127 +1,148 @@
-# Welcome to your Expo app 👋
+# Setting Up React Native
 
-Project Setup: React Native & Expo
-This guide provides a comprehensive, step-by-step walkthrough for setting up your development environment. Follow these instructions carefully to ensure everything runs smoothly.
+## Prerequisites: Install Node.js
 
-1. Core Prerequisites
-Before touching the mobile settings, ensure your machine has the foundational tools installed.
+- Download Node.js from [nodejs.org](https://nodejs.org/en/download). Standard setup options are fine.
+- Open your terminal and type `node -v` to verify the installation.
 
-Install Node.js
-Download: Go to Node.js Official Website and download the LTS version.
+---
 
-Setup: Run the installer using the standard/default options.
-
-Verify: Open your terminal (Command Prompt, PowerShell, or Zsh) and run:
-
-Bash
-node -v
-If a version number appears, you’re good to go.
-
-Install Dependencies
-Navigate to your project folder in the terminal and run:
-
-Bash
+## Step 1: Install Dependencies
+```bash
 npm install
-2. Android Studio & Environment Setup
-The "Ben Section": This part is crucial. Even if you use default installs, you must configure your "Path" so your computer knows where the Android tools live. Reference the Official Expo Docs if you need visual aids.
+```
 
-Phase 1: Finding Your Android SDK Path
-Open Android Studio.
+---
 
-On the welcome screen, click More Actions > SDK Manager.
+## Step 2: Configure Android Studio
 
-Note: If a project is already open, go to Settings (Windows) or Settings/Preferences (macOS) > Languages & Frameworks > Android SDK.
+> For a visual walkthrough, refer to the [official Expo setup guide](https://docs.expo.dev/get-started/set-up-your-environment/?platform=android&device=simulated).
 
-At the top, look for Android SDK Location.
+### Phase 1: Find Your Android SDK Path
 
-Copy this path exactly.
+Before configuring your environment, you need to locate where Android Studio installed the SDK.
 
-Windows Default: C:\Users\YourName\AppData\Local\Android\Sdk
+1. Open **Android Studio**.
+2. On the welcome screen, click **More Actions** → **SDK Manager**.
+   - *(If a project is already open: go to **Settings** → **Languages & Frameworks** → **Android SDK**)*
+3. At the top of the window, locate the **Android SDK Location** field.
+4. **Copy this path exactly.** You'll need it in the next steps.
 
-macOS Default: /Users/YourName/Library/Android/sdk
+**Default locations:**
+| OS | Default Path |
+|----|-------------|
+| Windows | `C:\Users\YourName\AppData\Local\Android\Sdk` |
+| macOS | `/Users/YourName/Library/Android/sdk` |
 
-Phase 2: macOS Setup (Zsh or Bash)
-Modern Macs use Zsh, while older ones use Bash.
+---
 
-Open Terminal.
+### Phase 2: macOS — Edit `.zshrc` or `.bash_profile`
 
-Check your shell: echo $SHELL
+1. Open **Terminal** and run the following to check your shell:
+```bash
+   echo $SHELL
+```
+   - `/bin/zsh` → edit `~/.zshrc`
+   - `/bin/bash` → edit `~/.bash_profile`
 
-If it says /bin/zsh, you edit ~/.zshrc.
+2. Open the appropriate file:
+```bash
+   nano ~/.zshrc
+```
+   *(or `nano ~/.bash_profile`)*
 
-If it says /bin/bash, you edit ~/.bash_profile.
+3. Navigate to the **bottom of the file** and paste the following, replacing the path with your actual SDK path from Phase 1:
+```bash
+   export ANDROID_HOME=/Users/YourName/Library/Android/sdk
+   export PATH=$PATH:$ANDROID_HOME/emulator
+   export PATH=$PATH:$ANDROID_HOME/platform-tools
+```
 
-Open the editor:
+4. **Save and exit:**
+   - Press `Control + O`, then `Enter` to save.
+   - Press `Control + X` to exit.
 
-Bash
-nano ~/.zshrc  # or nano ~/.bash_profile
-Scroll to the bottom and paste the following (replacing the path with the one you copied in Phase 1):
+5. Apply the changes:
+```bash
+   source ~/.zshrc
+```
+   *(or `source ~/.bash_profile`)*
 
-Bash
-export ANDROID_HOME=/Users/YourName/Library/Android/sdk
-export PATH=$PATH:$ANDROID_HOME/emulator
-export PATH=$PATH:$ANDROID_HOME/platform-tools
-Save/Exit: Press Ctrl + O, then Enter, then Ctrl + X.
+---
 
-Refresh: Run source ~/.zshrc (or source ~/.bash_profile).
+### Phase 3: Windows — Set Environment Variables
 
-Phase 3: Windows Setup (Environment Variables)
-Search for "env" in the Start Menu and select Edit the system environment variables.
+1. Click the **Start Button**, type `env`, and select **Edit the system environment variables**.
+2. In the window that appears, click **Environment Variables...** (bottom right).
 
-Click Environment Variables (bottom right).
+**Part A — Create `ANDROID_HOME`:**
+1. Under **User variables**, click **New...**
+2. Set the following:
+   - **Variable name:** `ANDROID_HOME`
+   - **Variable value:** *(paste your SDK path from Phase 1)*
+3. Click **OK**.
 
-Create ANDROID_HOME:
+**Part B — Update `Path`:**
+1. In **User variables**, find **Path** and click **Edit...**
+2. Click **New** and add: `%ANDROID_HOME%\platform-tools`
+3. Click **New** again and add: `%ANDROID_HOME%\emulator`
+4. Click **OK** on all windows to close them.
 
-Under User variables, click New.
+> ⚠️ **Important:** Close and reopen any terminal windows for the changes to take effect.
 
-Variable name: ANDROID_HOME
+---
 
-Variable value: Paste your SDK path (e.g., C:\Users\Ben\AppData\Local\Android\Sdk).
+### Phase 4: Android Studio Final Checklist
 
-Update Path:
+Even with correct paths, the emulator won't work unless the right tools are installed.
 
-In User variables, select Path and click Edit.
+1. Open the **SDK Manager** in Android Studio.
+2. Under the **SDK Platforms** tab, ensure the latest Android version (e.g., Android 14.0 or 15.0) is **checked**.
+3. Under the **SDK Tools** tab, ensure these are **checked**:
+   - ✅ Android SDK Build-Tools
+   - ✅ Android Emulator
+   - ✅ Android SDK Platform-Tools
+4. Click **Apply** to install any missing items.
 
-Click New and add: %ANDROID_HOME%\platform-tools
+---
 
-Click New again and add: %ANDROID_HOME%\emulator
+### Phase 5: Verify Your Setup
 
-Apply: Click OK on all windows and restart your terminal/VS Code.
+Run these commands to confirm everything is working:
+```bash
+adb --version
+```
+- ✅ **Success:** Displays `Android Debug Bridge version x.x.x`
+- ❌ **Failure:** `command not found` — re-check your Path configuration.
+```bash
+emulator -list-avds
+```
+- ✅ **Success:** Lists your virtual devices (or returns blank if none created yet — no error is fine)
+- ❌ **Failure:** Returns an error — re-check your Path configuration.
 
-Phase 4: Final SDK Checklist
-In the Android Studio SDK Manager, ensure the following are installed:
+---
 
-SDK Platforms Tab: Check the latest Android version (e.g., Android 14 or 15).
-
-SDK Tools Tab: Ensure these are checked:
-
-Android SDK Build-Tools
-
-Android Emulator
-
-Android SDK Platform-Tools
-
-Click Apply to install.
-
-Phase 5: Verification
-Run these commands to verify your setup:
-
-adb --version → Should show "Android Debug Bridge version..."
-
-emulator -list-avds → Should list your devices or return empty (no error).
-
-3. Launching the App
-Start the Expo Server
-Bash
+## Step 3: Start the App
+```bash
 npx expo start
-[!IMPORTANT]
-Windows PowerShell Error: If you see a red "running scripts is disabled" error, open PowerShell as Administrator and run:
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-Type Y and restart your terminal.
+```
 
-See It Live
-Virtual Phone (Emulator): Ensure your emulator is running in Android Studio. In your VS Code terminal, press a. The app will open automatically.
+> ⚠️ **Windows PowerShell Error:** If you see a red *"running scripts is disabled"* error, open a new PowerShell window **as Administrator**, run the command below, type `Y`, close it, and try again:
+> ```powershell
+> Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+> ```
 
-Physical Device: Download the Expo Go app on your phone and scan the QR code displayed in the terminal.
+---
 
-Live Updates: Open your project in VS Code (e.g., app/index.tsx), change some text, and hit Save. The app will update instantly!
+## Step 4: See It Live!
+
+When you run `npx expo start`, a QR code will appear in your terminal.
+
+- **Virtual Phone (Emulator):** If your Android emulator is already running, click inside the VS Code terminal and press the **`a`** key. The app will open automatically.
+
+From there:
+1. Open your project folder in **VS Code**.
+2. Navigate to `app/index.tsx` or `App.js`.
+3. Change some text and save — watch it update instantly!
+
+
