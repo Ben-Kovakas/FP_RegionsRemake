@@ -6,7 +6,7 @@ type Props = {
   headerContent?: React.ReactNode;  // optional — anything above the widget grid
 };
 
-export default function GridContainer({ children, headerContent }: Props) {
+function GridContainer({ children, headerContent }: Props) {
   return (
     <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
       
@@ -21,6 +21,9 @@ export default function GridContainer({ children, headerContent }: Props) {
     </ScrollView>
   );
 }
+
+export default GridContainer;
+export { GridContainer };
 
 const styles = StyleSheet.create({
   scroll: {

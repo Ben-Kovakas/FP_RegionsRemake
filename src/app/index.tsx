@@ -1,13 +1,17 @@
+import ClockWidget1 from "@/components/widget1/index";
+import ClockWidget2 from "@/components/widget2/index";
+import ClockWidget3 from "@/components/widget3/index";
 import GridContainer from "@/components/widgetGrid/GridContainer";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text } from "react-native";
 
 export default function Index() {
   return (
     
     <GridContainer headerContent={<Text style={{ fontSize: 24, fontWeight: 'bold' }}>My Dashboard</Text>}>
-      {/* Example widgets */}
-      <View style={{ backgroundColor: 'tomato', borderRadius: 8, flex: 1, margin: 4, height: 100 }} />
-      <View style={{ backgroundColor: 'skyblue', borderRadius: 8, flex: 1, margin: 4, height: 100 }} />
+      {/* Clock widgets */}
+      <ClockWidget1 />
+      <ClockWidget2 />
+      <ClockWidget3 />
       </GridContainer>
 
 
