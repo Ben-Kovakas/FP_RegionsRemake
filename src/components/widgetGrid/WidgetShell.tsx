@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, TouchableOpacity, ViewStyle } from 'react-native';
 
 // Valid size options for widgets
-type WidgetSize = '1x1' | '2x1' | '1x2' | '2x2';
+type WidgetSize = '1x1' | '2x1' | '1x2' | '2x2' | '2x4';
 
 type Props = {
   size: WidgetSize;
@@ -10,7 +10,7 @@ type Props = {
   children: React.ReactNode;
 };
 
-const UNIT = 100;
+const UNIT = 80;
 const GAP = 8;
 
 const sizes: Record<WidgetSize, ViewStyle> = {
@@ -18,6 +18,7 @@ const sizes: Record<WidgetSize, ViewStyle> = {
   '2x1': { width: UNIT*2+GAP,   height: UNIT },
   '1x2': { width: UNIT,         height: UNIT*2+GAP },
   '2x2': { width: UNIT*2+GAP,   height: UNIT*2+GAP },
+  '2x4': { width: UNIT*2+GAP,   height: UNIT*4+GAP*3 },
 };
 
 export default function WidgetShell({ size, onPress, children }: Props) {
