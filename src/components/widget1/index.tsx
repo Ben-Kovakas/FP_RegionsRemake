@@ -4,7 +4,7 @@ import WidgetShell from "../widgetGrid/WidgetShell";
 
 export default function ClockWidget1() {
     return (
-        <WidgetShell size="1x1" onPress={() => console.log('tapped')}>
+        <WidgetShell size="2x2" onPress={() => console.log('tapped')}>
             <View style={styles.container}>
                 <View style={styles.banner}>
                     <Text style={styles.bannerText}>WIDGET 1 - ALERTS</Text>
