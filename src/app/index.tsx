@@ -9,8 +9,8 @@ import { StyleSheet, Text, View } from "react-native";
 
 export default function Index() {
   return (
-    <View style={{ flex: 1 }}> 
-        <GridContainer headerContent={<Text style={{ fontSize: 24, fontWeight: 'bold' }}>My Dashboard</Text>}>
+    <View style={styles.container}> 
+        <GridContainer headerContent={<Text style={styles.title}>My Dashboard</Text>}>
           {/* Stock widgets */}
           <StockWidgetFull />
           <StockWidgetCompact />
