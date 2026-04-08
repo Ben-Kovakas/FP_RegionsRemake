@@ -3,10 +3,6 @@ import NotificationWidget2x1 from "@/components/staticWidgets/notifications";
 import { Safe2SpendWidget1x1, Safe2SpendWidget2x1, Safe2SpendWidget2x2 } from "@/components/staticWidgets/safe2spend";
 import StockWidgetCompact from "@/components/stockWidget/StockWidgetCompact";
 import StockWidgetFull from "@/components/stockWidget/StockWidgetFull";
-import ClockWidget1 from "@/components/widget1/index";
-import ClockWidget2 from "@/components/widget2/index";
-import ClockWidget3 from "@/components/widget3/index";
-import ClockWidget4 from "@/components/widget4/index";
 import GridContainer from "@/components/widgetGrid/GridContainer";
 import { StyleSheet, Text, View } from "react-native";
 
@@ -17,21 +13,8 @@ export default function Index() {
       {/* Stock widgets */}
       <StockWidgetFull />
       <StockWidgetCompact />
-      {/* Clock widgets */}
-      <ClockWidget1 />
-      <ClockWidget1 />
-      <ClockWidget3 />
-      <ClockWidget2 />
-      <ClockWidget2 />
-      <ClockWidget4 />
-      <ClockWidget4 />
-      <ClockWidget3 />
-      <ClockWidget1 />
-      <ClockWidget2 />
-      <ClockWidget2 />
-      <ClockWidget1 />
-      <ClockWidget1 />
-      {/* widgets */}
+     
+      {/* Static widgets */}
       <BalanceWidget1x1 />
       <BalanceWidget2x1 />
       <BalanceWidget2x2 />
