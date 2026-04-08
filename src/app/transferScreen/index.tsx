@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
-import Slider from '@react-native-community/slider';
+import { Svg, Circle } from 'react-native-svg';
 import { useRouter } from 'expo-router';
 
 const accountBalances = {
@@ -19,9 +19,13 @@ export default function TransferPage() {
   const [toAccount, setToAccount] = useState(null);
   const [openFrom, setOpenFrom] = useState(false);
   const [openTo, setOpenTo] = useState(false);
-  const [amount, setAmount] = useState(0);
+  const [amount, setAmount] = useState('');
 
   const maxAmount = useMemo(() => accountBalances[fromAccount] || 0, [fromAccount]);
+  const progress = useMemo(() => {
+    const val = parseFloat(amount) || 0;
+    return Math.min(val / maxAmount, 1);
+  }, [amount, maxAmount]);
 
   const filteredFromAccounts = accountsList.filter(acc => acc.value !== toAccount);
   const filteredToAccounts = accountsList.filter(acc => acc.value !== fromAccount);
@@ -29,12 +33,19 @@ export default function TransferPage() {
   const router = useRouter();
 
   const handleTransfer = () => {
-    if (!fromAccount || !toAccount || amount <= 0) return;
+    const transferAmount = parseFloat(amount);
+    if (!fromAccount || !toAccount || isNaN(transferAmount) || transferAmount <= 0) return;
 
     router.push(
-      `/transferScreen/Success?from=${fromAccount}&to=${toAccount}&amount=${amount}`
+      `/transferScreen/Success?from=${fromAccount}&to=${toAccount}&amount=${transferAmount}`
     );
   };
+
+  const CIRCLE_SIZE = 120;
+  const STROKE_WIDTH = 12;
+  const RADIUS = (CIRCLE_SIZE - STROKE_WIDTH) / 2;
+  const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
+  const strokeDashoffset = CIRCUMFERENCE * (1 - progress);
 
   return (
     <View style={styles.container}>
@@ -66,20 +77,48 @@ export default function TransferPage() {
         />
       </View>
 
-      <View style={styles.sliderWrapper}>
-        <Text style={styles.label}>Amount: ${amount}</Text>
-            <Slider
-              style={{ width: '100%', height: 40 }}
-              minimumValue={0}
-              maximumValue={maxAmount}
-              step={1}
-              value={amount}
-              onValueChange={setAmount}
-              minimumTrackTintColor="#22c55e"
-              maximumTrackTintColor="#065f46"
-              thumbTintColor="#16a34a"
-            />
+      <View style={{ marginTop: 16 }}>
+        <Text style={styles.label}>Amount:</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter amount"
+          keyboardType="numeric"
+          value={amount}
+          onChangeText={(text) => {
+            const num = text.replace(/[^0-9]/g, '');
+            setAmount(num);
+          }}
+        />
         <Text style={styles.balanceText}>Max available: ${maxAmount}</Text>
+
+        <View style={styles.amountWrapper}>
+            <View style={styles.circleWrapper}>
+              <Svg width={CIRCLE_SIZE} height={CIRCLE_SIZE}>
+                <Circle
+                  stroke="#d1fae5"
+                  fill="none"
+                  cx={CIRCLE_SIZE / 2}
+                  cy={CIRCLE_SIZE / 2}
+                  r={RADIUS}
+                  strokeWidth={STROKE_WIDTH}
+                />
+                <Circle
+                  stroke="#22c55e"
+                  fill="none"
+                  cx={CIRCLE_SIZE / 2}
+                  cy={CIRCLE_SIZE / 2}
+                  r={RADIUS}
+                  strokeWidth={STROKE_WIDTH}
+                  strokeDasharray={`${CIRCUMFERENCE} ${CIRCUMFERENCE}`}
+                  strokeDashoffset={strokeDashoffset}
+                  strokeLinecap="round"
+                  rotation="-90"
+                  origin={`${CIRCLE_SIZE / 2}, ${CIRCLE_SIZE / 2}`}
+                />
+              </Svg>
+              <Text style={styles.amountText}>${amount || 0}</Text>
+          </View>
+        </View>
 
         <TouchableOpacity style={styles.button} onPress={handleTransfer}>
           <Text style={styles.buttonText}>Submit Transfer</Text>
@@ -93,7 +132,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: '#ffffff',
+    backgroundColor: '#fff',
   },
   header: {
     fontSize: 26,
@@ -115,13 +154,27 @@ const styles = StyleSheet.create({
   dropdownContainer: {
     backgroundColor: '#dcfce7',
   },
-  sliderWrapper: {
-    marginTop: 32,
+  amountWrapper: {
+    marginTop: 16,
+    alignItems: 'center',
+    width: '100%',
+  },
+  input: {
+    backgroundColor: '#f0fdf4',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    fontSize: 18,
+    width: '100%',
+    textAlign: 'center',
+    borderWidth: 1,
+    borderColor: '#000',
+    marginBottom: 8,
   },
   balanceText: {
-    marginTop: 8,
     color: '#166534',
     fontWeight: '600',
+    marginBottom: 16,
   },
   button: {
     backgroundColor: '#22c55e',
@@ -129,10 +182,24 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center',
     marginTop: 16,
+    width: '100%',
   },
   buttonText: {
-    color: '#ffffff',
+    color: '#fff',
     fontWeight: 'bold',
     fontSize: 16,
-  }
+  },
+  circleWrapper: {
+    width: 120,
+    height: 120,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginVertical: 16,
+  },
+  amountText: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#16a34a',
+    position: 'absolute',
+  },
 });
