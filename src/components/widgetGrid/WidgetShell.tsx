@@ -6,7 +6,11 @@ import {
   View,
 } from 'react-native';
 
-import { useWidgetGridContext, useWidgetSlotId } from './widgetGridContext';
+import {
+  useWidgetGridContext,
+  useWidgetGridParticipation,
+  useWidgetSlotId,
+} from './widgetGridContext';
 import { GAP, WIDGET_PIXEL_SIZES, WidgetRect, WidgetSize } from './widgetLayout';
 
 type Props = {
@@ -14,31 +18,44 @@ type Props = {
   onPress?: () => void;
   children: React.ReactNode;
   widgetId?: string;
+  transparentBackground?: boolean;
   isEditMode?: boolean;
   isSelected?: boolean;
   onMoveIntent?: () => void;
   onSelectIntent?: () => void;
 };
 
-export default function WidgetShell({ size, onPress, children, widgetId }: Props) {
+export default function WidgetShell({
+  size,
+  onPress,
+  children,
+  widgetId,
+  transparentBackground = false,
+}: Props) {
   // Shell owns placement/edit affordances; children remain fully opaque widget content.
   const gridContext = useWidgetGridContext();
+  const doesParticipateInGrid = useWidgetGridParticipation();
   const slotWidgetId = useWidgetSlotId();
   const resolvedWidgetId = widgetId ?? slotWidgetId;
   const shellRef = React.useRef<View>(null);
-  const isEditMode = gridContext?.isEditMode ?? false;
-  const isSelected = resolvedWidgetId != null && gridContext?.selectedWidgetId === resolvedWidgetId;
-  const isDragging = resolvedWidgetId != null && gridContext?.draggingWidgetId === resolvedWidgetId;
+  const isEditMode = (gridContext?.isEditMode ?? false) && doesParticipateInGrid;
+  const disableInnerPointerEvents = !doesParticipateInGrid && (gridContext?.isEditMode ?? false);
+  const isSelected = doesParticipateInGrid
+    && resolvedWidgetId != null
+    && gridContext?.selectedWidgetId === resolvedWidgetId;
+  const isDragging = doesParticipateInGrid
+    && resolvedWidgetId != null
+    && gridContext?.draggingWidgetId === resolvedWidgetId;
 
   React.useEffect(() => {
-    if (gridContext == null || resolvedWidgetId == null) {
+    if (!doesParticipateInGrid || gridContext == null || resolvedWidgetId == null) {
       return;
     }
     gridContext.registerShellMeta(resolvedWidgetId, size);
-  }, [gridContext, resolvedWidgetId, size]);
+  }, [doesParticipateInGrid, gridContext, resolvedWidgetId, size]);
 
   const reportLayout = React.useCallback(() => {
-    if (gridContext == null || resolvedWidgetId == null || shellRef.current == null) {
+    if (!doesParticipateInGrid || gridContext == null || resolvedWidgetId == null || shellRef.current == null) {
       return;
     }
 
@@ -46,9 +63,15 @@ export default function WidgetShell({ size, onPress, children, widgetId }: Props
       const rect: WidgetRect = { x, y, width, height };
       gridContext.reportShellLayout(resolvedWidgetId, rect);
     });
-  }, [gridContext, resolvedWidgetId]);
+  }, [doesParticipateInGrid, gridContext, resolvedWidgetId]);
 
   const handlePress = React.useCallback(() => {
+    if (!doesParticipateInGrid) {
+      if (!gridContext?.isEditMode) {
+        onPress?.();
+      }
+      return;
+    }
     if (isEditMode) {
       if (resolvedWidgetId != null) {
         gridContext?.onShellPress(resolvedWidgetId);
@@ -56,49 +79,52 @@ export default function WidgetShell({ size, onPress, children, widgetId }: Props
       return;
     }
     onPress?.();
-  }, [gridContext, isEditMode, onPress, resolvedWidgetId]);
+  }, [doesParticipateInGrid, gridContext, isEditMode, onPress, resolvedWidgetId]);
 
   const panResponder = React.useMemo(() => PanResponder.create({
-    onStartShouldSetPanResponder: () => isEditMode && resolvedWidgetId != null,
+    onStartShouldSetPanResponder: () => doesParticipateInGrid && isEditMode && resolvedWidgetId != null,
     onMoveShouldSetPanResponder: (_, gestureState) => {
-      if (!isEditMode || resolvedWidgetId == null) {
+      if (!doesParticipateInGrid || !isEditMode || resolvedWidgetId == null) {
         return false;
       }
       return Math.abs(gestureState.dx) > 2 || Math.abs(gestureState.dy) > 2;
     },
     onPanResponderGrant: (_, gestureState) => {
-      if (!isEditMode || resolvedWidgetId == null) {
+      if (!doesParticipateInGrid || !isEditMode || resolvedWidgetId == null) {
         return;
       }
       gridContext?.onDragStart(resolvedWidgetId);
       gridContext?.onDragMove(resolvedWidgetId, gestureState.moveX, gestureState.moveY);
     },
     onPanResponderMove: (_, gestureState) => {
-      if (!isEditMode || resolvedWidgetId == null) {
+      if (!doesParticipateInGrid || !isEditMode || resolvedWidgetId == null) {
         return;
       }
       gridContext?.onDragMove(resolvedWidgetId, gestureState.moveX, gestureState.moveY);
     },
     onPanResponderRelease: (_, gestureState) => {
-      if (!isEditMode || resolvedWidgetId == null) {
+      if (!doesParticipateInGrid || !isEditMode || resolvedWidgetId == null) {
         return;
       }
       gridContext?.onDragEnd(resolvedWidgetId, gestureState.moveX, gestureState.moveY);
     },
     onPanResponderTerminate: (_, gestureState) => {
-      if (!isEditMode || resolvedWidgetId == null) {
+      if (!doesParticipateInGrid || !isEditMode || resolvedWidgetId == null) {
         return;
       }
       gridContext?.onDragEnd(resolvedWidgetId, gestureState.moveX, gestureState.moveY);
     },
-  }), [gridContext, isEditMode, resolvedWidgetId]);
+  }), [doesParticipateInGrid, gridContext, isEditMode, resolvedWidgetId]);
 
   return (
     <View
       ref={shellRef}
+      pointerEvents={disableInnerPointerEvents ? 'none' : 'auto'}
       style={[
         styles.base,
+        transparentBackground && styles.transparentBackground,
         WIDGET_PIXEL_SIZES[size],
+        !doesParticipateInGrid && styles.groupInnerBase,
         isEditMode && styles.baseEditMode,
         isSelected && styles.selected,
         isDragging && styles.dragging,
@@ -106,7 +132,9 @@ export default function WidgetShell({ size, onPress, children, widgetId }: Props
       onLayout={reportLayout}
     >
       <Pressable style={styles.pressableArea} onPress={handlePress} android_ripple={undefined}>
-        {children}
+        <View style={styles.contentClip}>
+          {children}
+        </View>
       </Pressable>
       {isEditMode && (
         <View style={styles.dragHandle} {...panResponder.panHandlers}>
@@ -122,7 +150,13 @@ const styles = StyleSheet.create({
     margin: GAP / 2,
     borderRadius: 12,
     backgroundColor: '#1e1e1e',
-    overflow: 'hidden',
+    overflow: 'visible',
+  },
+  transparentBackground: {
+    backgroundColor: 'transparent',
+  },
+  groupInnerBase: {
+    margin: 0,
   },
   baseEditMode: {
     borderWidth: 1,
@@ -140,6 +174,13 @@ const styles = StyleSheet.create({
   },
   pressableArea: {
     flex: 1,
+    margin: 2,
+    borderRadius: 10,
+  },
+  contentClip: {
+    flex: 1,
+    borderRadius: 10,
+    overflow: 'hidden',
   },
   dragHandle: {
     position: 'absolute',

@@ -1,14 +1,14 @@
+import { useRouter } from 'expo-router';
 import React from 'react';
 import { StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import WidgetShell from "../widgetGrid/WidgetShell";
-import { useRouter } from 'expo-router';
 
 const useScale = () => {
     const { width } = useWindowDimensions();
     const baseWidth = 375;
     const scale = width / baseWidth;
 
-    return (size) => Math.round(size * scale);
+    return (size: number) => Math.round(size * scale);
 };
 
 export function TransferWidget() {

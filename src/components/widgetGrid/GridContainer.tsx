@@ -110,6 +110,7 @@ function GridContainer({ children, headerContent }: Props) {
   const [orderedWidgetIds, setOrderedWidgetIds] = React.useState(() => childEntries.map((entry) => entry.id));
   const [sizesById, setSizesById] = React.useState<Record<string, WidgetSize>>({});
   const layoutsRef = React.useRef<Record<string, WidgetRect>>({});
+  const didRunInitialSizeCheckRef = React.useRef(false);
 
   React.useEffect(() => {
     const incomingIds = childEntries.map((entry) => entry.id);
@@ -133,6 +134,10 @@ function GridContainer({ children, headerContent }: Props) {
 
   React.useEffect(() => {
     if (!__DEV__) {
+      return;
+    }
+    if (!didRunInitialSizeCheckRef.current) {
+      didRunInitialSizeCheckRef.current = true;
       return;
     }
     const missingSizeIds = orderedRenderableIds.filter((widgetId) => sizesById[widgetId] == null);
@@ -260,7 +265,7 @@ function GridContainer({ children, headerContent }: Props) {
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
         scrollEnabled={draggingWidgetId == null}
-        nestedScrollEnabled={!isEditMode}
+        nestedScrollEnabled={true}
       >
         <View style={styles.header}>
           <View style={styles.headerContent}>{headerContent}</View>

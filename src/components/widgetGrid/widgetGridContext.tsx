@@ -16,6 +16,7 @@ type WidgetGridContextValue = {
 
 export const WidgetGridContext = React.createContext<WidgetGridContextValue | null>(null);
 export const WidgetSlotIdContext = React.createContext<string | null>(null);
+export const WidgetGridParticipationContext = React.createContext<boolean>(true);
 
 export function useWidgetGridContext() {
   return React.useContext(WidgetGridContext);
@@ -23,4 +24,8 @@ export function useWidgetGridContext() {
 
 export function useWidgetSlotId() {
   return React.useContext(WidgetSlotIdContext);
+}
+
+export function useWidgetGridParticipation() {
+  return React.useContext(WidgetGridParticipationContext);
 }
