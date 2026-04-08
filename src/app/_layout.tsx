@@ -15,6 +15,8 @@ export default function RootLayout() {
   return (
     <Stack>
       <Stack.Screen name="index" options={{ headerShown: false }} />
+      <Stack.Screen name="transferScreen/index" options={{ ...zelleScreenOptions, title: "Transfer Funds" }} />
+      <Stack.Screen name="transferScreen/Success" options={{ ...zelleScreenOptions, title: "Transfer Successful" }} />
       <Stack.Screen name="zelle/pay" options={{ ...zelleScreenOptions, title: "Pay" }} />
       <Stack.Screen name="zelle/request" options={{ ...zelleScreenOptions, title: "Request" }} />
       <Stack.Screen name="zelle/activity" options={{ ...zelleScreenOptions, title: "Activity" }} />
