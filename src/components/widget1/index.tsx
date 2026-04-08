@@ -7,13 +7,15 @@ export default function ClockWidget1() {
         <WidgetShell size="2x2" onPress={() => console.log('tapped')}>
             <View style={styles.container}>
                 <View style={styles.banner}>
-                    <Text style={styles.bannerText}>WIDGET 1 - ALERTS</Text>
+                    <Text style={styles.bannerText}>ALERTS</Text>
                 </View>
                 <View style={styles.row}>
                     <View style={styles.dot} />
                     <Text style={styles.title}>3 New Alerts</Text>
                 </View>
-                <Text style={styles.subtitle}>Unusual login · Low balance · Statement ready</Text>
+                <Text style={styles.subtitle}>· Unusual login</Text>
+                <Text style={styles.subtitle}>· Low balance</Text>
+                <Text style={styles.subtitle}>· Statement ready</Text>
                 <Text style={styles.caption}>Just now</Text>
             </View>
         </WidgetShell>
