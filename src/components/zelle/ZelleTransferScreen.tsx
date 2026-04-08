@@ -17,6 +17,7 @@ import {
   zelleContacts,
   zelleTransactions,
 } from './zelleData';
+import ZelleQrModal, { ZelleQrMode } from './ZelleQrModal';
 
 type Props = {
   mode: 'pay' | 'request';
@@ -36,6 +37,7 @@ export default function ZelleTransferScreen({ mode }: Props) {
   const [amount, setAmount] = React.useState('');
   const [memo, setMemo] = React.useState('');
   const [confirmation, setConfirmation] = React.useState('');
+  const [qrMode, setQrMode] = React.useState<ZelleQrMode | null>(null);
 
   const isPay = mode === 'pay';
   const actionLabel = isPay ? 'Pay' : 'Request';
@@ -84,6 +86,30 @@ export default function ZelleTransferScreen({ mode }: Props) {
           <Text style={styles.subtitle}>
             {isPay ? 'Send money to someone you know.' : 'Ask someone you know for money.'}
           </Text>
+        </View>
+
+        <View style={styles.card}>
+          <Text style={styles.label}>QR shortcuts</Text>
+          <View style={styles.shortcutRow}>
+            <Pressable
+              style={styles.shortcutButton}
+              onPress={() => setQrMode('my-code')}
+            >
+              <Text style={styles.shortcutTitle}>My code</Text>
+              <Text style={styles.shortcutCopy}>
+                Pull up your Zelle QR code.
+              </Text>
+            </Pressable>
+            <Pressable
+              style={styles.shortcutButton}
+              onPress={() => setQrMode('scan')}
+            >
+              <Text style={styles.shortcutTitle}>Scan code</Text>
+              <Text style={styles.shortcutCopy}>
+                Scan a friend to start faster.
+              </Text>
+            </Pressable>
+          </View>
         </View>
 
         <View style={styles.card}>
@@ -177,6 +203,12 @@ export default function ZelleTransferScreen({ mode }: Props) {
           )}
         </View>
       </ScrollView>
+      <ZelleQrModal
+        mode={qrMode}
+        visible={qrMode != null}
+        onClose={() => setQrMode(null)}
+        onUseScannedContact={selectContact}
+      />
     </SafeAreaView>
   );
 }
@@ -232,6 +264,31 @@ const styles = StyleSheet.create({
     color: '#21142d',
     backgroundColor: '#ffffff',
     fontSize: 15,
+  },
+  shortcutRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+  },
+  shortcutButton: {
+    flexGrow: 1,
+    flexBasis: 140,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#e2dce8',
+    backgroundColor: '#f7f6fb',
+    padding: 12,
+    gap: 4,
+  },
+  shortcutTitle: {
+    color: '#6d1ed4',
+    fontSize: 15,
+    fontWeight: '900',
+  },
+  shortcutCopy: {
+    color: '#5f5769',
+    fontSize: 12,
+    lineHeight: 16,
   },
   amountInput: {
     fontSize: 24,

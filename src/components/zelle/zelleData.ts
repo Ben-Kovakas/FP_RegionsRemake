@@ -23,6 +23,12 @@ export type ZelleTransaction = {
   status: string;
 };
 
+export const zelleAccount = {
+  name: 'Alex Carter',
+  handle: 'alex.carter@email.com',
+  phone: '(312) 555-0108',
+};
+
 export const zelleContacts: ZelleContact[] = [
   {
     id: 'maya',
