@@ -3,6 +3,7 @@ import NotificationWidget2x1 from "@/components/staticWidgets/notifications";
 import { RecurringWidget2x1, RecurringWidget2x2 } from "@/components/staticWidgets/recurringPayments";
 import { Safe2SpendWidget1x1, Safe2SpendWidget2x1, Safe2SpendWidget2x2 } from "@/components/staticWidgets/safe2spend";
 import StockWidgetCompact from "@/components/stockWidget/StockWidgetCompact";
+import StockWidget1x1 from "@/components/stockWidget/StockWidget1x1";
 import StockWidgetFull from "@/components/stockWidget/StockWidgetFull";
 import { TransferWidget } from "@/components/transferWidgets/TransferWidget";
 import GridContainer from "@/components/widgetGrid/GridContainer";
@@ -16,6 +17,7 @@ export default function Index() {
           {/* Stock widgets */}
           <StockWidgetFull />
           <StockWidgetCompact />
+          <StockWidget1x1 />
 
           {/* Zello widgets */}
           <ZelleLogoWidget key="zelle-logo" />

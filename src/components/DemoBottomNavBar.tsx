@@ -20,7 +20,7 @@ const DEMO_NAV_ITEMS: DemoNavItem[] = [
 function isActivePath(pathname: string, href: Href) {
   const route = String(href);
   if (route === '/') {
-    return pathname === '/';
+    return pathname === '/' || pathname.startsWith('/stock');
   }
   return pathname === route || pathname.startsWith(`${route}/`);
 }

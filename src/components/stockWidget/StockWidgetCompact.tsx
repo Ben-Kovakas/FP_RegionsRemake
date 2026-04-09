@@ -1,20 +1,10 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { useRouter } from 'expo-router';
 import WidgetShell from '../widgetGrid/WidgetShell';
+import { StockData, STOCKS } from './stockData';
 
-type StockData = {
-  ticker: string;
-  company: string;
-  price: number;
-  changePercent: number;
-};
-
-const PLACEHOLDER: StockData = {
-  ticker: 'AAPL',
-  company: 'Apple Inc.',
-  price: 189.42,
-  changePercent: 2.34,
-};
+const PLACEHOLDER = STOCKS.AAPL;
 
 const CHART_POINTS = [30, 45, 38, 55, 50, 62, 58, 70, 65, 72, 68, 75];
 
@@ -71,12 +61,13 @@ const chartStyles = StyleSheet.create({
 });
 
 export default function StockWidgetCompact({ data = PLACEHOLDER }: { data?: StockData }) {
+  const router = useRouter();
   const isPositive = data.changePercent >= 0;
   const changeColor = isPositive ? '#4CAF50' : '#F44336';
   const changePrefix = isPositive ? '+' : '';
 
   return (
-    <WidgetShell size="2x2" onPress={() => console.log('stock compact tapped')}>
+    <WidgetShell size="2x2" onPress={() => router.push(`/stock/${data.ticker}` as any)}>
       <View style={styles.container}>
         {/* Header */}
         <View style={styles.header}>

@@ -24,6 +24,16 @@ export default function RootLayout() {
           <Stack.Screen name="zelle/pay" options={{ ...zelleScreenOptions, title: "Pay" }} />
           <Stack.Screen name="zelle/request" options={{ ...zelleScreenOptions, title: "Request" }} />
           <Stack.Screen name="zelle/activity" options={{ ...zelleScreenOptions, title: "Activity" }} />
+          <Stack.Screen
+            name="stock/[ticker]"
+            options={{
+              contentStyle: { backgroundColor: "#0d0d1a" },
+              headerStyle: { backgroundColor: "#0d0d1a" },
+              headerTintColor: "#ffffff",
+              headerTitleStyle: { fontWeight: "900" as const },
+              title: "Stock",
+            }}
+          />
         </Stack>
       </View>
       <DemoBottomNavBar />
