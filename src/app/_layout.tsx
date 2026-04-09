@@ -24,6 +24,7 @@ export default function RootLayout() {
           <Stack.Screen name="zelle/pay" options={{ ...zelleScreenOptions, title: "Pay" }} />
           <Stack.Screen name="zelle/request" options={{ ...zelleScreenOptions, title: "Request" }} />
           <Stack.Screen name="zelle/activity" options={{ ...zelleScreenOptions, title: "Activity" }} />
+          <Stack.Screen name="stocks/index" options={{ ...zelleScreenOptions, title: "Stocks" }} />
           <Stack.Screen
             name="stock/[ticker]"
             options={{

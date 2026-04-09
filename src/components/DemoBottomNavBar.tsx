@@ -1,5 +1,5 @@
 import { Href, usePathname, useRouter } from 'expo-router';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -10,35 +10,45 @@ type DemoNavItem = {
 };
 
 const DEMO_NAV_ITEMS: DemoNavItem[] = [
-  { href: '/', label: 'Stocks', testID: 'demo-nav-stocks' },
+  { href: '/stocks', label: 'Stocks', testID: 'demo-nav-stocks' },
   { href: '/transferScreen', label: 'Transfer', testID: 'demo-nav-transfer' },
-  { href: '/zelle/pay', label: 'Zelle Pay', testID: 'demo-nav-zelle-pay' },
-  { href: '/zelle/request', label: 'Request', testID: 'demo-nav-zelle-request' },
-  { href: '/zelle/activity', label: 'Activity', testID: 'demo-nav-zelle-activity' },
+  { href: '/', label: 'Main', testID: 'demo-nav-main' },
+  { href: '/zelle/pay', label: 'Pay', testID: 'demo-nav-pay' },
+  { href: '/zelle/request', label: 'Request', testID: 'demo-nav-request' },
+  { href: '/zelle/activity', label: 'Activity', testID: 'demo-nav-activity' },
 ];
-
-function isActivePath(pathname: string, href: Href) {
-  const route = String(href);
-  if (route === '/') {
-    return pathname === '/' || pathname.startsWith('/stock');
-  }
-  return pathname === route || pathname.startsWith(`${route}/`);
-}
 
 export default function DemoBottomNavBar() {
   const router = useRouter();
   const pathname = usePathname();
   const insets = useSafeAreaInsets();
+  const [activeHref, setActiveHref] = useState<string>('/');
+
+  // Sync activeHref when pathname changes from external navigation (e.g. back button, deep link)
+  useEffect(() => {
+    const match = DEMO_NAV_ITEMS.find((item) => {
+      const route = String(item.href);
+      if (route === '/') return pathname === '/';
+      if (route === '/stocks') return pathname === '/stocks' || pathname.startsWith('/stock/');
+      return pathname === route || pathname.startsWith(`${route}/`);
+    });
+    if (match) {
+      setActiveHref(String(match.href));
+    }
+  }, [pathname]);
 
   return (
     <View style={[styles.bar, { paddingBottom: Math.max(insets.bottom, 8) }]} testID="demo-bottom-nav">
       {DEMO_NAV_ITEMS.map((item) => {
-        const isActive = isActivePath(pathname, item.href);
+        const isActive = activeHref === String(item.href);
         return (
           <Pressable
             key={item.testID}
             testID={item.testID}
-            onPress={() => router.push(item.href)}
+            onPress={() => {
+              setActiveHref(String(item.href));
+              router.replace(item.href);
+            }}
             style={[styles.tab, isActive && styles.tabActive]}
             android_ripple={{ color: 'rgba(54, 138, 74, 0.15)', borderless: false }}
           >
