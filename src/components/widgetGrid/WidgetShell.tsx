@@ -123,7 +123,7 @@ export default function WidgetShell({
       style={[
         styles.base,
         transparentBackground && styles.transparentBackground,
-        WIDGET_PIXEL_SIZES[size],
+        doesParticipateInGrid ? WIDGET_PIXEL_SIZES[size] : styles.groupInnerFill,
         !doesParticipateInGrid && styles.groupInnerBase,
         isEditMode && styles.baseEditMode,
         isSelected && styles.selected,
@@ -131,8 +131,20 @@ export default function WidgetShell({
       ]}
       onLayout={reportLayout}
     >
-      <Pressable style={styles.pressableArea} onPress={handlePress} android_ripple={undefined}>
-        <View style={styles.contentClip}>
+      <Pressable
+        style={[
+          styles.pressableArea,
+          transparentBackground && styles.transparentPressableArea,
+        ]}
+        onPress={handlePress}
+        android_ripple={undefined}
+      >
+        <View
+          style={[
+            styles.contentClip,
+            transparentBackground && styles.transparentContentClip,
+          ]}
+        >
           {children}
         </View>
       </Pressable>
@@ -158,6 +170,12 @@ const styles = StyleSheet.create({
   groupInnerBase: {
     margin: 0,
   },
+  groupInnerFill: {
+    flex: 1,
+    alignSelf: 'stretch',
+    minWidth: 0,
+    minHeight: 0,
+  },
   baseEditMode: {
     borderWidth: 1,
     borderColor: '#4a4a4a',
@@ -177,10 +195,18 @@ const styles = StyleSheet.create({
     margin: 2,
     borderRadius: 10,
   },
+  transparentPressableArea: {
+    margin: 0,
+    borderRadius: 0,
+  },
   contentClip: {
     flex: 1,
     borderRadius: 10,
     overflow: 'hidden',
+  },
+  transparentContentClip: {
+    borderRadius: 0,
+    overflow: 'visible',
   },
   dragHandle: {
     position: 'absolute',

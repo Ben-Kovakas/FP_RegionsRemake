@@ -25,24 +25,33 @@ function ZelleWidget({ variant }: Props) {
       <View style={[styles.tile, isActivity && styles.activityTile]}>
         {isActivity ? (
           <>
-            <View style={styles.activityHeader}>
-              <ZelleLogo compact markOnly />
-              <View style={styles.activityHeaderText}>
-                <Text style={styles.activityEyebrow}>Activity</Text>
-                <Text style={styles.activityName} numberOfLines={2}>
-                  {latestTransaction.counterparty}
-                </Text>
+            <View style={styles.activityTopRow}>
+              <View style={styles.activityIdentity}>
+                <ZelleLogo compact markOnly />
+                <View style={styles.activityHeaderText}>
+                  <Text style={styles.activityEyebrow}>Zelle activity</Text>
+                  <Text style={styles.activityName} numberOfLines={1}>
+                    {latestTransaction.counterparty}
+                  </Text>
+                </View>
               </View>
+              <Text
+                style={styles.activityAmount}
+                numberOfLines={1}
+                adjustsFontSizeToFit
+                minimumFontScale={0.8}
+              >
+                {getSignedAmount(latestTransaction)}
+              </Text>
             </View>
-            <Text style={styles.activityAmount}>
-              {getSignedAmount(latestTransaction)}
-            </Text>
-            <Text style={styles.activityNote} numberOfLines={2}>
-              {latestTransaction.note}
-            </Text>
-            <Text style={styles.activityDate} numberOfLines={1}>
-              {latestTransaction.date}
-            </Text>
+            <View style={styles.activityMetaRow}>
+              <Text style={styles.activityNote} numberOfLines={1}>
+                {latestTransaction.note}
+              </Text>
+              <Text style={styles.activityDate} numberOfLines={1}>
+                {latestTransaction.date}
+              </Text>
+            </View>
           </>
         ) : (
           <ZelleLogo />
@@ -75,12 +84,22 @@ const styles = StyleSheet.create({
   activityTile: {
     alignItems: 'stretch',
     justifyContent: 'space-between',
-    padding: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    gap: 8,
   },
-  activityHeader: {
+  activityTopRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 5,
+    justifyContent: 'space-between',
+    gap: 8,
+  },
+  activityIdentity: {
+    flex: 1,
+    minWidth: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
   activityHeaderText: {
     flex: 1,
@@ -88,27 +107,36 @@ const styles = StyleSheet.create({
   },
   activityEyebrow: {
     color: '#6d1ed4',
-    fontSize: 8,
+    fontSize: 7,
     fontWeight: '900',
+    letterSpacing: 0.4,
+    lineHeight: 9,
     textTransform: 'uppercase',
   },
   activityName: {
     color: '#21142d',
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: '800',
-    lineHeight: 12,
+    lineHeight: 13,
   },
   activityAmount: {
     color: '#21142d',
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '900',
-    marginTop: 8,
+    flexShrink: 1,
+    textAlign: 'right',
+  },
+  activityMetaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   activityNote: {
     color: '#4f4659',
-    fontSize: 10,
+    flex: 1,
+    fontSize: 9,
     fontWeight: '700',
-    lineHeight: 13,
+    lineHeight: 11,
   },
   activityDate: {
     color: '#7c7288',
