@@ -41,7 +41,7 @@ export default function WidgetGroup({ variant, children }: Props) {
         <WidgetSlotIdContext.Provider value={null}>
           <View style={styles.container}>
             {variant === 'four_1x1' && (
-              <>
+              <View style={styles.fourGrid}>
                 <View style={styles.row}>
                   {renderChildSlot(first, 'group-a')}
                   {renderChildSlot(second, 'group-b')}
@@ -50,7 +50,7 @@ export default function WidgetGroup({ variant, children }: Props) {
                   {renderChildSlot(third, 'group-c')}
                   {renderChildSlot(fourth, 'group-d')}
                 </View>
-              </>
+              </View>
             )}
 
             {variant === 'two_2x1' && (
@@ -100,6 +100,10 @@ export default function WidgetGroup({ variant, children }: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  fourGrid: {
+    flex: 1,
+    gap: GAP,
   },
   row: {
     flex: 1,
