@@ -83,17 +83,17 @@ export function Safe2SpendWidget2x1() {
     );
 }
 
-//2x2 — larger donut on top, breakdown and payday info in rows below
+//2x4 — larger donut on top, breakdown and payday info in rows below
 
 export function Safe2SpendWidget2x2() {
     const spent = TOTAL_BUDGET - SAFE_AMOUNT;
 
     return (
-        <WidgetShell size="2x2" onPress={() => console.log('tapped')}>
+        <WidgetShell size="2x4" onPress={() => console.log('tapped')}>
             <View style={styles.container2x2}>
 
                 <View style={styles.donutWrap2x2}>
-                    <DonutRing size={140} strokeWidth={13} />
+                    <DonutRing size={155} strokeWidth={10} />
                     <View style={styles.donutCenter}>
                         <Text style={styles.amountLarge}>${SAFE_AMOUNT.toFixed(2)}</Text>
                         <Text style={styles.amountCaption}>safe to spend</Text>
@@ -134,8 +134,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#88bd40',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 6,
-        padding: 10,
+        gap: 1,
+        padding: 1,
     },
     donutWrap1x1: {
         position: 'relative',
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
         fontSize: 13,
         fontWeight: '500',
         color: '#ffffff',
-        //textAlign: 'center',
+        textAlign: 'center',
     },
 
     // 2x1
@@ -170,18 +170,18 @@ const styles = StyleSheet.create({
     },
     details: {
         flex: 1,
-        gap: 3,
+        gap: 0,
     },
     subLabel: {
-        fontSize: 11,
+        fontSize: 10,
         color: 'rgba(255,255,255,0.65)',
     },
     payday: {
-        fontSize: 11,
+        fontSize: 10,
         color: 'rgba(255,255,255,0.65)',
     },
     paydayDays: {
-        fontSize: 15,
+        fontSize: 12,
         fontWeight: '500',
         color: '#ffffff',
     },
@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
         position: 'relative',
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: 4,
+        marginBottom: 25,
     },
     amountLarge: {
         fontSize: 20,
@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     amountCaption: {
-        fontSize: 10,
+        fontSize: 18,
         color: 'rgba(255,255,255,0.65)',
         textAlign: 'center',
     },
@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingVertical: 3,
+        paddingVertical: 4,
     },
     rowLabel: {
         fontSize: 12,
@@ -254,6 +254,6 @@ const styles = StyleSheet.create({
     divider: {
         height: 0.5,
         backgroundColor: 'rgba(255,255,255,0.3)',
-        marginVertical: 6,
+        marginVertical: 1,
     },
 });

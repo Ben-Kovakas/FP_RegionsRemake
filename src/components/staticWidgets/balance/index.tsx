@@ -25,7 +25,7 @@ export function BalanceWidget1x1() {
 
 export function BalanceWidget2x1() {
     return (
-        <WidgetShell size="1x2" onPress={() => console.log('tapped')}>
+        <WidgetShell size="2x1" onPress={() => console.log('tapped')}>
             <View style={styles.container}>
                 {accounts.map((acct, i) => (
                     <View key={i} style={[styles.accountRow, i < accounts.length - 1 && styles.accountRowBorder]}>
@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingVertical: 6,
+        paddingVertical: 3,
     },
     accountRowBorder: {
         borderBottomWidth: 0.5,
