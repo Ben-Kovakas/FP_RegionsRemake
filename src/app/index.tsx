@@ -6,6 +6,7 @@ import StockWidgetCompact from "@/components/stockWidget/StockWidgetCompact";
 import StockWidgetFull from "@/components/stockWidget/StockWidgetFull";
 import { TransferWidget } from "@/components/transferWidgets/TransferWidget";
 import GridContainer from "@/components/widgetGrid/GridContainer";
+import WidgetGroup from "@/components/widgetGrid/WidgetGroup";
 import { ZelleActivityWidget, ZelleLogoWidget } from "@/components/zelle/ZelleWidget";
 import { StyleSheet, Text, View } from "react-native";
 
@@ -17,24 +18,29 @@ export default function Index() {
           <StockWidgetFull />
           <StockWidgetCompact />
 
-          {/* Zello widgets */}
-          <ZelleLogoWidget key="zelle-logo" />
-          <ZelleActivityWidget key="zelle-activity" />
+          {/* 2x2 grouping: four 1x1 widgets */}
+          <WidgetGroup key="group-four-1x1" variant="four_1x1">
+            <BalanceWidget1x1 />
+            <Safe2SpendWidget1x1 />
+            <TransferWidget />
+            <ZelleLogoWidget />
+          </WidgetGroup>
+
+          {/* 2x2 grouping: two 2x1 widgets */}
+          <WidgetGroup key="group-two-2x1" variant="two_2x1">
+            <ZelleActivityWidget />
+            <Safe2SpendWidget2x1 />
+          </WidgetGroup>
 
           {/* Static widgets */}
-          <BalanceWidget1x1 />
           <BalanceWidget2x1 />
           <BalanceWidget2x2 />
-          <Safe2SpendWidget1x1 />
-          <Safe2SpendWidget2x1 />
           <Safe2SpendWidget2x2 />
           <NotificationWidget2x1 />
           <RecurringWidget2x1 />
           <RecurringWidget2x2 />
 
 
-          {/* Transfer widgets */}
-          <TransferWidget />
       </GridContainer>
     </View>
   );
