@@ -1,0 +1,18 @@
+export const ZELLE_REGIONS_COLORS = {
+  primary: '#84BD00',
+  primaryAlt: '#88BD40',
+  secondary: '#658D1B',
+  secondaryAlt: '#55893D',
+  pageBackground: '#f5faf1',
+  surface: '#ffffff',
+  surfaceTint: '#f2f8e6',
+  surfaceTintStrong: '#e6f1cf',
+  border: '#d7e7b5',
+  borderStrong: '#c4d89a',
+  heading: '#1f2b12',
+  text: '#171717',
+  body: '#4f5f41',
+  muted: '#708062',
+  buttonText: '#1b2a0f',
+  shadow: '#35561d',
+};

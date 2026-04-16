@@ -33,6 +33,19 @@ const actions: { label: string; route: ZelleRoute; helper: string }[] = [
   },
 ];
 
+const COLORS = {
+  sheetBackground: '#ffffff',
+  sheetBorder: '#dde2e7',
+  buttonBackground: '#ffffff',
+  buttonBorder: '#d9dfe5',
+  buttonPressed: '#f3f5f7',
+  heading: '#171717',
+  body: '#5e656d',
+  actionLabel: '#171717',
+  actionHelper: '#5f6670',
+  shadow: '#000000',
+};
+
 export default function ZelleActionModal({ visible, onClose }: Props) {
   const router = useRouter();
 
@@ -61,7 +74,10 @@ export default function ZelleActionModal({ visible, onClose }: Props) {
             {actions.map((action) => (
               <Pressable
                 key={action.route}
-                style={styles.actionButton}
+                style={({ pressed }) => [
+                  styles.actionButton,
+                  pressed && styles.actionButtonPressed,
+                ]}
                 onPress={() => openRoute(action.route)}
               >
                 <Text style={styles.actionLabel}>{action.label}</Text>
@@ -87,22 +103,24 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 360,
     borderRadius: 8,
-    backgroundColor: '#ffffff',
+    borderWidth: 1,
+    borderColor: COLORS.sheetBorder,
+    backgroundColor: COLORS.sheetBackground,
     padding: 18,
-    shadowColor: '#000000',
-    shadowOpacity: 0.2,
+    shadowColor: COLORS.shadow,
+    shadowOpacity: 0.18,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 6 },
     elevation: 8,
   },
   sheetTitle: {
-    color: '#21142d',
+    color: COLORS.heading,
     fontSize: 24,
     fontWeight: '900',
   },
   sheetSubtitle: {
     marginTop: 4,
-    color: '#5b5363',
+    color: COLORS.body,
     fontSize: 14,
     lineHeight: 19,
   },
@@ -112,20 +130,24 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     borderWidth: 1,
-    borderColor: '#ded6eb',
+    borderColor: COLORS.buttonBorder,
     borderRadius: 8,
     paddingHorizontal: 14,
     paddingVertical: 12,
-    backgroundColor: '#ffffff',
+    backgroundColor: COLORS.buttonBackground,
+  },
+  actionButtonPressed: {
+    borderColor: '#c6ccd3',
+    backgroundColor: COLORS.buttonPressed,
   },
   actionLabel: {
-    color: '#6d1ed4',
+    color: COLORS.actionLabel,
     fontSize: 16,
     fontWeight: '800',
   },
   actionHelper: {
     marginTop: 2,
-    color: '#60586a',
+    color: COLORS.actionHelper,
     fontSize: 12,
     lineHeight: 16,
   },

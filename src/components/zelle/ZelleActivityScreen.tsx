@@ -1,3 +1,4 @@
+import { useLocalSearchParams } from 'expo-router';
 import React from 'react';
 import {
   SafeAreaView,
@@ -15,6 +16,15 @@ import {
   getSignedAmount,
   zelleTransactions,
 } from './zelleData';
+import { ZELLE_REGIONS_COLORS as COLORS } from './zelleTheme';
+
+function getSingleParam(value: string | string[] | undefined) {
+  if (Array.isArray(value)) {
+    return value[0];
+  }
+
+  return value;
+}
 
 function getAmountStyle(transaction: ZelleTransaction) {
   if (transaction.kind === 'paid') {
@@ -29,6 +39,8 @@ function getAmountStyle(transaction: ZelleTransaction) {
 }
 
 export default function ZelleActivityScreen() {
+  const params = useLocalSearchParams();
+  const highlightedTransactionId = getSingleParam(params.transactionId);
   const activityTransactions = zelleTransactions.filter((transaction) => transaction.kind !== 'requested');
   const totalMoved = activityTransactions.reduce((sum, transaction) => sum + transaction.amount, 0);
 
@@ -52,7 +64,13 @@ export default function ZelleActivityScreen() {
             const contact = getContactById(transaction.contactId);
 
             return (
-              <View key={transaction.id} style={styles.activityRow}>
+              <View
+                key={transaction.id}
+                style={[
+                  styles.activityRow,
+                  highlightedTransactionId === transaction.id && styles.activityRowHighlighted,
+                ]}
+              >
                 <View style={styles.avatar}>
                   <Text style={styles.avatarText}>
                     {contact?.initials ?? transaction.counterparty.slice(0, 2).toUpperCase()}
@@ -147,6 +165,11 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 8,
     backgroundColor: '#ffffff',
+  },
+  activityRowHighlighted: {
+    borderWidth: 1,
+    borderColor: COLORS.primary,
+    backgroundColor: COLORS.surfaceTint,
   },
   avatar: {
     width: 42,

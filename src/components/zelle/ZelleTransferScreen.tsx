@@ -1,3 +1,4 @@
+import { useLocalSearchParams } from 'expo-router';
 import React from 'react';
 import {
   Pressable,
@@ -11,17 +12,50 @@ import {
 
 import {
   ZelleContact,
-  describeTransaction,
+  ZelleTransaction,
   formatCurrency,
   getContactById,
+  getTransactionById,
   zelleContacts,
   zelleTransactions,
 } from './zelleData';
 import ZelleQrModal, { ZelleQrMode } from './ZelleQrModal';
+import { ZELLE_REGIONS_COLORS as COLORS } from './zelleTheme';
 
 type Props = {
   mode: 'pay' | 'request';
 };
+
+const CONTACT_AVATAR_PURPLE = '#6d1ed4';
+
+function getSingleParam(value: string | string[] | undefined) {
+  if (Array.isArray(value)) {
+    return value[0];
+  }
+
+  return value;
+}
+
+function getPrefillAmount(value: string | undefined) {
+  if (value == null) {
+    return '';
+  }
+
+  const parsedAmount = Number(value.replace(/[^0-9.]/g, ''));
+  if (Number.isNaN(parsedAmount) || parsedAmount <= 0) {
+    return '';
+  }
+
+  return parsedAmount.toFixed(2);
+}
+
+function getResolvedContactId(contactId: string | undefined) {
+  if (contactId != null && getContactById(contactId) != null) {
+    return contactId;
+  }
+
+  return zelleContacts[0]?.id ?? null;
+}
 
 function ContactAvatar({ contact }: { contact: ZelleContact }) {
   return (
@@ -32,10 +66,32 @@ function ContactAvatar({ contact }: { contact: ZelleContact }) {
 }
 
 export default function ZelleTransferScreen({ mode }: Props) {
+  const params = useLocalSearchParams();
+  const transactionIdParam = getSingleParam(params.transactionId);
+  const prefillTransaction = React.useMemo(
+    () => (
+      transactionIdParam == null
+        ? undefined
+        : getTransactionById(transactionIdParam)
+    ),
+    [transactionIdParam],
+  );
+  const contactIdParam = getSingleParam(params.contactId) ?? prefillTransaction?.contactId;
+  const amountParam = getSingleParam(params.amount) ?? (
+    prefillTransaction != null ? String(prefillTransaction.amount) : undefined
+  );
+  const memoParam = getSingleParam(params.memo) ?? prefillTransaction?.note;
+
   const [query, setQuery] = React.useState('');
-  const [selectedContactId, setSelectedContactId] = React.useState<string | null>(zelleContacts[0]?.id ?? null);
-  const [amount, setAmount] = React.useState('');
-  const [memo, setMemo] = React.useState('');
+  const [selectedContactId, setSelectedContactId] = React.useState<string | null>(
+    getResolvedContactId(contactIdParam),
+  );
+  const [selectedTransactionId, setSelectedTransactionId] = React.useState<string | null>(
+    prefillTransaction?.id ?? null,
+  );
+  const [amount, setAmount] = React.useState(() => getPrefillAmount(amountParam));
+  const [memo, setMemo] = React.useState(() => memoParam ?? '');
+  const [autofillBanner, setAutofillBanner] = React.useState('');
   const [confirmation, setConfirmation] = React.useState('');
   const [qrMode, setQrMode] = React.useState<ZelleQrMode | null>(null);
 
@@ -56,12 +112,84 @@ export default function ZelleTransferScreen({ mode }: Props) {
     ));
   }, [query]);
 
-  const recentTransactions = React.useMemo(() => zelleTransactions.slice(0, 4), []);
+  const recentTransactions = React.useMemo(() => (
+    zelleTransactions
+      .filter((transaction) => (isPay ? transaction.kind === 'paid' : transaction.kind === 'requested'))
+      .slice(0, 4)
+  ), [isPay]);
+
+  const showAutofillBanner = React.useCallback((message: string) => {
+    setAutofillBanner(message);
+  }, []);
+
+  React.useEffect(() => {
+    if (autofillBanner.length === 0) {
+      return undefined;
+    }
+
+    const timeoutId = setTimeout(() => {
+      setAutofillBanner('');
+    }, 3200);
+
+    return () => clearTimeout(timeoutId);
+  }, [autofillBanner]);
 
   const selectContact = React.useCallback((contactId: string) => {
     setSelectedContactId(contactId);
+    setSelectedTransactionId(null);
+    setAutofillBanner('');
     setConfirmation('');
   }, []);
+
+  const selectRecentTransaction = React.useCallback((transaction: ZelleTransaction) => {
+    setSelectedContactId(transaction.contactId);
+    setSelectedTransactionId(transaction.id);
+    setAmount(transaction.amount.toFixed(2));
+    setMemo(transaction.note);
+    showAutofillBanner(
+      `${formatCurrency(transaction.amount)} and "${transaction.note}" were autofilled from ${transaction.counterparty}.`,
+    );
+    setConfirmation('');
+  }, [showAutofillBanner]);
+
+  React.useEffect(() => {
+    setSelectedContactId(getResolvedContactId(contactIdParam));
+    setSelectedTransactionId(prefillTransaction?.id ?? null);
+
+    setAmount(getPrefillAmount(amountParam));
+    setMemo(memoParam ?? '');
+
+    if (
+      transactionIdParam != null
+      || contactIdParam != null
+      || amountParam != null
+      || memoParam != null
+    ) {
+      if (prefillTransaction != null) {
+        const bannerMessage = (
+          isPay && prefillTransaction.kind === 'requested'
+            ? `${prefillTransaction.counterparty} requested ${formatCurrency(prefillTransaction.amount)}. We've filled in the payment for you.`
+            : `${formatCurrency(prefillTransaction.amount)} and "${prefillTransaction.note}" were autofilled for ${prefillTransaction.counterparty}.`
+        );
+        showAutofillBanner(bannerMessage);
+      } else if (amountParam != null || memoParam != null || contactIdParam != null) {
+        showAutofillBanner(`${actionLabel} details were autofilled for you.`);
+      }
+
+      setConfirmation('');
+    } else {
+      setAutofillBanner('');
+    }
+  }, [
+    actionLabel,
+    amountParam,
+    contactIdParam,
+    isPay,
+    memoParam,
+    prefillTransaction,
+    showAutofillBanner,
+    transactionIdParam,
+  ]);
 
   const submitTransfer = React.useCallback(() => {
     const parsedAmount = Number(amount.replace(/[^0-9.]/g, ''));
@@ -87,6 +215,12 @@ export default function ZelleTransferScreen({ mode }: Props) {
             {isPay ? 'Send money to someone you know.' : 'Ask someone you know for money.'}
           </Text>
         </View>
+
+        {autofillBanner.length > 0 && (
+          <View style={styles.banner}>
+            <Text style={styles.bannerText}>{autofillBanner}</Text>
+          </View>
+        )}
 
         <View style={styles.card}>
           <Text style={styles.label}>QR shortcuts</Text>
@@ -118,27 +252,29 @@ export default function ZelleTransferScreen({ mode }: Props) {
             value={query}
             onChangeText={setQuery}
             placeholder="Name, email, or phone"
-            placeholderTextColor="#837b8d"
+            placeholderTextColor={COLORS.muted}
             style={styles.input}
           />
         </View>
 
-        <Text style={styles.sectionTitle}>Recent activity</Text>
+        <Text style={styles.sectionTitle}>{isPay ? 'Recent payments' : 'Recent requests'}</Text>
         <View style={styles.recentList}>
           {recentTransactions.map((transaction) => (
             <Pressable
               key={transaction.id}
               style={[
                 styles.recentCard,
-                selectedContactId === transaction.contactId && styles.selectedCard,
+                selectedTransactionId != null
+                  ? selectedTransactionId === transaction.id && styles.selectedCard
+                  : selectedContactId === transaction.contactId && styles.selectedCard,
               ]}
-              onPress={() => selectContact(transaction.contactId)}
+              onPress={() => selectRecentTransaction(transaction)}
             >
               <Text style={styles.recentTitle} numberOfLines={1}>
                 {transaction.counterparty}
               </Text>
               <Text style={styles.recentMeta} numberOfLines={2}>
-                {describeTransaction(transaction)}
+                {transaction.note} | {transaction.date}
               </Text>
               <Text style={styles.recentAmount}>
                 {formatCurrency(transaction.amount)}
@@ -178,7 +314,7 @@ export default function ZelleTransferScreen({ mode }: Props) {
             value={amount}
             onChangeText={setAmount}
             placeholder="$0.00"
-            placeholderTextColor="#837b8d"
+            placeholderTextColor={COLORS.muted}
             keyboardType="decimal-pad"
             style={[styles.input, styles.amountInput]}
           />
@@ -187,7 +323,7 @@ export default function ZelleTransferScreen({ mode }: Props) {
             value={memo}
             onChangeText={setMemo}
             placeholder={isPay ? 'Dinner, rent, tickets' : 'What is this for?'}
-            placeholderTextColor="#837b8d"
+            placeholderTextColor={COLORS.muted}
             style={styles.input}
           />
           {selectedContact && (
@@ -216,7 +352,7 @@ export default function ZelleTransferScreen({ mode }: Props) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#f2f4f8',
+    backgroundColor: COLORS.pageBackground,
   },
   content: {
     padding: 18,
@@ -227,42 +363,56 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   eyebrow: {
-    color: '#6d1ed4',
+    color: COLORS.secondaryAlt,
     fontSize: 13,
     fontWeight: '900',
     textTransform: 'uppercase',
   },
   title: {
-    color: '#1f1728',
+    color: COLORS.heading,
     fontSize: 32,
     fontWeight: '900',
   },
   subtitle: {
-    color: '#5e5668',
+    color: COLORS.body,
     fontSize: 15,
     lineHeight: 21,
   },
+  banner: {
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: COLORS.borderStrong,
+    backgroundColor: COLORS.surfaceTintStrong,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+  },
+  bannerText: {
+    color: COLORS.secondaryAlt,
+    fontSize: 13,
+    fontWeight: '800',
+    lineHeight: 18,
+  },
   card: {
     borderRadius: 8,
-    backgroundColor: '#ffffff',
+    backgroundColor: COLORS.surface,
     padding: 14,
     gap: 10,
     borderWidth: 1,
-    borderColor: '#e4e0eb',
+    borderColor: COLORS.border,
   },
   label: {
-    color: '#352a40',
+    color: COLORS.secondaryAlt,
     fontSize: 13,
     fontWeight: '800',
   },
   input: {
     minHeight: 44,
     borderWidth: 1,
-    borderColor: '#d7d0e4',
+    borderColor: COLORS.borderStrong,
     borderRadius: 8,
     paddingHorizontal: 12,
-    color: '#21142d',
-    backgroundColor: '#ffffff',
+    color: COLORS.text,
+    backgroundColor: COLORS.surface,
     fontSize: 15,
   },
   shortcutRow: {
@@ -275,18 +425,18 @@ const styles = StyleSheet.create({
     flexBasis: 140,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#e2dce8',
-    backgroundColor: '#f7f6fb',
+    borderColor: COLORS.borderStrong,
+    backgroundColor: COLORS.surfaceTint,
     padding: 12,
     gap: 4,
   },
   shortcutTitle: {
-    color: '#6d1ed4',
+    color: COLORS.secondaryAlt,
     fontSize: 15,
     fontWeight: '900',
   },
   shortcutCopy: {
-    color: '#5f5769',
+    color: COLORS.body,
     fontSize: 12,
     lineHeight: 16,
   },
@@ -295,7 +445,7 @@ const styles = StyleSheet.create({
     fontWeight: '900',
   },
   sectionTitle: {
-    color: '#21142d',
+    color: COLORS.heading,
     fontSize: 18,
     fontWeight: '900',
     marginTop: 4,
@@ -310,27 +460,27 @@ const styles = StyleSheet.create({
     flexBasis: 150,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#e2dce8',
-    backgroundColor: '#ffffff',
+    borderColor: COLORS.border,
+    backgroundColor: COLORS.surface,
     padding: 12,
     gap: 5,
   },
   selectedCard: {
-    borderColor: '#6d1ed4',
-    backgroundColor: '#f5f0ff',
+    borderColor: COLORS.primary,
+    backgroundColor: COLORS.surfaceTintStrong,
   },
   recentTitle: {
-    color: '#21142d',
+    color: COLORS.heading,
     fontSize: 14,
     fontWeight: '900',
   },
   recentMeta: {
-    color: '#635c6f',
+    color: COLORS.body,
     fontSize: 12,
     lineHeight: 16,
   },
   recentAmount: {
-    color: '#6d1ed4',
+    color: COLORS.secondaryAlt,
     fontSize: 16,
     fontWeight: '900',
   },
@@ -343,7 +493,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
   },
   selectedContactRow: {
-    backgroundColor: '#f5f0ff',
+    backgroundColor: COLORS.surfaceTint,
   },
   avatar: {
     width: 42,
@@ -351,7 +501,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#6d1ed4',
+    backgroundColor: CONTACT_AVATAR_PURPLE,
   },
   avatarText: {
     color: '#ffffff',
@@ -363,47 +513,49 @@ const styles = StyleSheet.create({
     minWidth: 0,
   },
   contactName: {
-    color: '#21142d',
+    color: COLORS.heading,
     fontSize: 15,
     fontWeight: '900',
   },
   contactHandle: {
-    color: '#61586c',
+    color: COLORS.body,
     fontSize: 12,
   },
   contactNote: {
-    color: '#766d82',
+    color: COLORS.muted,
     fontSize: 12,
     marginTop: 2,
   },
   favoriteLabel: {
-    color: '#6d1ed4',
+    color: COLORS.secondaryAlt,
     fontSize: 11,
     fontWeight: '900',
   },
   emptyText: {
-    color: '#61586c',
+    color: COLORS.body,
     fontSize: 14,
   },
   selectionCopy: {
-    color: '#4c4357',
+    color: COLORS.body,
     fontSize: 13,
     fontWeight: '700',
   },
   primaryButton: {
     minHeight: 46,
     borderRadius: 8,
+    borderWidth: 1,
+    borderColor: COLORS.secondary,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#6d1ed4',
+    backgroundColor: COLORS.primary,
   },
   primaryButtonText: {
-    color: '#ffffff',
+    color: COLORS.buttonText,
     fontSize: 16,
     fontWeight: '900',
   },
   confirmation: {
-    color: '#2e6b3f',
+    color: COLORS.secondaryAlt,
     fontSize: 13,
     fontWeight: '800',
     lineHeight: 18,

@@ -153,6 +153,10 @@ export function getContactById(contactId: string) {
   return zelleContacts.find((contact) => contact.id === contactId);
 }
 
+export function getTransactionById(transactionId: string) {
+  return zelleTransactions.find((transaction) => transaction.id === transactionId);
+}
+
 export function describeTransaction(transaction: ZelleTransaction) {
   if (transaction.kind === 'paid') {
     return `Paid ${transaction.counterparty}`;

@@ -1,9 +1,11 @@
+import { Href, useRouter } from 'expo-router';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import WidgetShell from '../widgetGrid/WidgetShell';
 import ZelleActionModal from './ZelleActionModal';
 import { getSignedAmount, zelleTransactions } from './zelleData';
+import { ZELLE_REGIONS_COLORS as COLORS } from './zelleTheme';
 import ZelleLogo from './ZelleLogo';
 
 type ZelleWidgetVariant = 'logo' | 'activity';
@@ -13,25 +15,55 @@ type Props = {
 };
 
 function ZelleWidget({ variant }: Props) {
+  const router = useRouter();
   const [isActionModalVisible, setIsActionModalVisible] = React.useState(false);
-  const latestTransaction = zelleTransactions[0];
   const isActivity = variant === 'activity';
+  const featuredTransaction = React.useMemo(() => (
+    zelleTransactions.find((transaction) => transaction.kind === 'requested')
+    ?? zelleTransactions[0]
+    ?? null
+  ), []);
+
+  const handlePress = React.useCallback(() => {
+    if (!isActivity) {
+      setIsActionModalVisible(true);
+      return;
+    }
+
+    if (featuredTransaction == null) {
+      return;
+    }
+
+    const destination: Href = featuredTransaction.kind === 'requested'
+      ? {
+        pathname: '/zelle/pay',
+        params: { transactionId: featuredTransaction.id },
+      }
+      : {
+        pathname: '/zelle/activity',
+        params: { transactionId: featuredTransaction.id },
+      };
+
+    router.push(destination);
+  }, [featuredTransaction, isActivity, router]);
 
   return (
     <WidgetShell
       size={isActivity ? '2x1' : '1x1'}
-      onPress={() => setIsActionModalVisible(true)}
+      onPress={handlePress}
     >
       <View style={[styles.tile, isActivity && styles.activityTile]}>
-        {isActivity ? (
+        {isActivity && featuredTransaction != null ? (
           <>
             <View style={styles.activityTopRow}>
               <View style={styles.activityIdentity}>
                 <ZelleLogo compact markOnly />
                 <View style={styles.activityHeaderText}>
-                  <Text style={styles.activityEyebrow}>Zelle activity</Text>
+                  <Text style={styles.activityEyebrow}>
+                    {featuredTransaction.kind === 'requested' ? 'Pending request' : 'Zelle activity'}
+                  </Text>
                   <Text style={styles.activityName} numberOfLines={1}>
-                    {latestTransaction.counterparty}
+                    {featuredTransaction.counterparty}
                   </Text>
                 </View>
               </View>
@@ -41,15 +73,17 @@ function ZelleWidget({ variant }: Props) {
                 adjustsFontSizeToFit
                 minimumFontScale={0.8}
               >
-                {getSignedAmount(latestTransaction)}
+                {getSignedAmount(featuredTransaction)}
               </Text>
             </View>
             <View style={styles.activityMetaRow}>
               <Text style={styles.activityNote} numberOfLines={1}>
-                {latestTransaction.note}
+                {featuredTransaction.note}
               </Text>
               <Text style={styles.activityDate} numberOfLines={1}>
-                {latestTransaction.date}
+                {featuredTransaction.kind === 'requested'
+                  ? `${featuredTransaction.status} | ${featuredTransaction.date}`
+                  : featuredTransaction.date}
               </Text>
             </View>
           </>
@@ -87,6 +121,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 8,
     gap: 8,
+    backgroundColor: COLORS.surfaceTint,
   },
   activityTopRow: {
     flexDirection: 'row',
@@ -106,7 +141,7 @@ const styles = StyleSheet.create({
     minWidth: 0,
   },
   activityEyebrow: {
-    color: '#6d1ed4',
+    color: COLORS.secondaryAlt,
     fontSize: 7,
     fontWeight: '900',
     letterSpacing: 0.4,
@@ -114,13 +149,13 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   activityName: {
-    color: '#21142d',
+    color: COLORS.heading,
     fontSize: 11,
     fontWeight: '800',
     lineHeight: 13,
   },
   activityAmount: {
-    color: '#21142d',
+    color: COLORS.heading,
     fontSize: 15,
     fontWeight: '900',
     flexShrink: 1,
@@ -132,14 +167,14 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   activityNote: {
-    color: '#4f4659',
+    color: COLORS.body,
     flex: 1,
     fontSize: 9,
     fontWeight: '700',
     lineHeight: 11,
   },
   activityDate: {
-    color: '#7c7288',
+    color: COLORS.secondary,
     fontSize: 9,
     fontWeight: '700',
   },
