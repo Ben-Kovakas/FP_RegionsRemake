@@ -46,6 +46,7 @@ export default function DemoBottomNavBar() {
             key={item.testID}
             testID={item.testID}
             onPress={() => {
+              if (isActive) return;
               setActiveHref(String(item.href));
               router.replace(item.href);
             }}

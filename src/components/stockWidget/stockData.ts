@@ -7,6 +7,7 @@ export type StockData = {
   high: number;
   low: number;
   volume: string;
+  volumeNum: number; // numeric volume for sorting
   marketCap: string;
   peRatio: number;
   weekHigh52: number;
@@ -15,6 +16,18 @@ export type StockData = {
   dividend: string;
   earningsDate: string;
 };
+
+export type MarketIndex = {
+  name: string;
+  value: number;
+  changePercent: number;
+};
+
+export const MARKET_INDICES: MarketIndex[] = [
+  { name: 'S&P 500', value: 5218.19, changePercent: 0.87 },
+  { name: 'NASDAQ', value: 16340.87, changePercent: 1.24 },
+  { name: 'DOW', value: 39150.33, changePercent: 0.32 },
+];
 
 export const STOCKS: Record<string, StockData> = {
   AAPL: {
@@ -26,6 +39,7 @@ export const STOCKS: Record<string, StockData> = {
     high: 191.23,
     low: 187.45,
     volume: '48.2M',
+    volumeNum: 48200000,
     marketCap: '2.94T',
     peRatio: 29.8,
     weekHigh52: 199.62,
@@ -43,6 +57,7 @@ export const STOCKS: Record<string, StockData> = {
     high: 143.10,
     low: 140.90,
     volume: '22.1M',
+    volumeNum: 22100000,
     marketCap: '1.78T',
     peRatio: 24.1,
     weekHigh52: 153.78,
@@ -60,6 +75,7 @@ export const STOCKS: Record<string, StockData> = {
     high: 250.80,
     low: 239.50,
     volume: '112.5M',
+    volumeNum: 112500000,
     marketCap: '790.2B',
     peRatio: 62.5,
     weekHigh52: 299.29,
@@ -67,6 +83,132 @@ export const STOCKS: Record<string, StockData> = {
     avgVolume: '98.7M',
     dividend: '--',
     earningsDate: 'Jul 17, 2026',
+  },
+  NVDA: {
+    ticker: 'NVDA',
+    company: 'NVIDIA Corp.',
+    price: 878.35,
+    changePercent: 5.67,
+    open: 835.20,
+    high: 882.10,
+    low: 832.50,
+    volume: '62.3M',
+    volumeNum: 62300000,
+    marketCap: '2.17T',
+    peRatio: 68.4,
+    weekHigh52: 974.00,
+    weekLow52: 393.01,
+    avgVolume: '58.2M',
+    dividend: '0.04 (0.005%)',
+    earningsDate: 'Aug 14, 2026',
+  },
+  MSFT: {
+    ticker: 'MSFT',
+    company: 'Microsoft Corp.',
+    price: 415.60,
+    changePercent: 1.15,
+    open: 412.30,
+    high: 417.80,
+    low: 411.50,
+    volume: '19.8M',
+    volumeNum: 19800000,
+    marketCap: '3.09T',
+    peRatio: 35.2,
+    weekHigh52: 430.82,
+    weekLow52: 309.45,
+    avgVolume: '22.4M',
+    dividend: '3.00 (0.72%)',
+    earningsDate: 'Jul 24, 2026',
+  },
+  AMZN: {
+    ticker: 'AMZN',
+    company: 'Amazon.com Inc.',
+    price: 186.75,
+    changePercent: -1.42,
+    open: 189.80,
+    high: 190.20,
+    low: 185.30,
+    volume: '55.1M',
+    volumeNum: 55100000,
+    marketCap: '1.93T',
+    peRatio: 58.7,
+    weekHigh52: 201.20,
+    weekLow52: 118.35,
+    avgVolume: '50.8M',
+    dividend: '--',
+    earningsDate: 'Aug 1, 2026',
+  },
+  META: {
+    ticker: 'META',
+    company: 'Meta Platforms Inc.',
+    price: 502.30,
+    changePercent: -2.85,
+    open: 516.40,
+    high: 518.90,
+    low: 498.10,
+    volume: '28.7M',
+    volumeNum: 28700000,
+    marketCap: '1.28T',
+    peRatio: 33.1,
+    weekHigh52: 542.81,
+    weekLow52: 274.38,
+    avgVolume: '24.5M',
+    dividend: '--',
+    earningsDate: 'Jul 30, 2026',
+  },
+  AMD: {
+    ticker: 'AMD',
+    company: 'Advanced Micro Devices',
+    price: 162.45,
+    changePercent: 3.28,
+    open: 157.80,
+    high: 164.20,
+    low: 156.90,
+    volume: '71.8M',
+    volumeNum: 71800000,
+    marketCap: '262.5B',
+    peRatio: 45.3,
+    weekHigh52: 227.30,
+    weekLow52: 93.12,
+    avgVolume: '65.4M',
+    dividend: '--',
+    earningsDate: 'Jul 29, 2026',
+  },
+  NFLX: {
+    ticker: 'NFLX',
+    company: 'Netflix Inc.',
+    price: 628.90,
+    changePercent: -0.92,
+    open: 634.50,
+    high: 636.80,
+    low: 625.40,
+    volume: '8.4M',
+    volumeNum: 8400000,
+    marketCap: '272.1B',
+    peRatio: 44.8,
+    weekHigh52: 650.00,
+    weekLow52: 344.73,
+    avgVolume: '9.1M',
+    dividend: '--',
+    earningsDate: 'Jul 17, 2026',
+  },
+  JPM: {
+    ticker: 'JPM',
+    company: 'JPMorgan Chase & Co.',
+    price: 198.20,
+    changePercent: 0.45,
+    open: 197.30,
+    high: 199.50,
+    low: 196.80,
+    volume: '10.2M',
+    volumeNum: 10200000,
+    marketCap: '571.8B',
+    peRatio: 11.9,
+    weekHigh52: 205.88,
+    weekLow52: 144.34,
+    avgVolume: '11.3M',
+    dividend: '4.60 (2.32%)',
+    earningsDate: 'Jul 11, 2026',
   },
 };
 

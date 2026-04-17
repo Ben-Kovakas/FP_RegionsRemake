@@ -26,7 +26,7 @@ type Props = {
   headerContent?: React.ReactNode;
 };
 
-const ENABLE_NATIVE_PLACER = false;
+const ENABLE_NATIVE_PLACER = true;
 
 function moveWidgetBefore(list: string[], sourceId: string, targetId: string) {
   if (sourceId === targetId) {
@@ -245,7 +245,8 @@ function GridContainer({ children, headerContent }: Props) {
     futurePlacements.forEach((placement) => {
       maxRow = Math.max(maxRow, placement.row + placement.rowSpan);
     });
-    return maxRow * UNIT + Math.max(maxRow - 1, 0) * GAP;
+    return maxRow * UNIT + Math.max(maxRow - 1, 0) * GAP
+      + maxRow * GAP;
   }, [futurePlacements]);
 
   const toggleEditMode = React.useCallback(() => {
@@ -261,12 +262,37 @@ function GridContainer({ children, headerContent }: Props) {
 
   return (
     <WidgetGridContext.Provider value={gridContextValue}>
-      <ScrollView
-        style={styles.scroll}
-        contentContainerStyle={styles.scrollContent}
-        scrollEnabled={draggingWidgetId == null}
-        nestedScrollEnabled={true}
-      >
+      <View style={styles.wrapper}>
+        <ScrollView
+          style={styles.scroll}
+          contentContainerStyle={styles.scrollContent}
+          scrollEnabled={draggingWidgetId == null}
+          nestedScrollEnabled={true}
+        >
+          <View style={[styles.grid, usingNativePlacer && { height: futureContainerHeight }]}>
+            {orderedRenderableIds.map((widgetId, index) => {
+              const child = childMap[widgetId];
+              if (child == null) {
+                return null;
+              }
+
+              const placement = usingNativePlacer ? futurePlacements?.[index] : null;
+              const absoluteStyle = placement == null
+                ? null
+                : {
+                  position: 'absolute' as const,
+                  left: placement.col * (UNIT + GAP),
+                  top: placement.row * (UNIT + GAP),
+                };
+
+              return (
+                <WidgetSlotIdContext.Provider key={widgetId} value={widgetId}>
+                  <View style={absoluteStyle}>{child}</View>
+                </WidgetSlotIdContext.Provider>
+              );
+            })}
+          </View>
+        </ScrollView>
         <View style={styles.header}>
           <View style={styles.headerContent}>{headerContent}</View>
           <Pressable onPress={toggleEditMode} style={[styles.editButton, isEditMode && styles.editButtonActive]}>
@@ -275,30 +301,7 @@ function GridContainer({ children, headerContent }: Props) {
             </Text>
           </Pressable>
         </View>
-        <View style={[styles.grid, usingNativePlacer && { height: futureContainerHeight }]}>
-          {orderedRenderableIds.map((widgetId, index) => {
-            const child = childMap[widgetId];
-            if (child == null) {
-              return null;
-            }
-
-            const placement = usingNativePlacer ? futurePlacements?.[index] : null;
-            const absoluteStyle = placement == null
-              ? null
-              : {
-                position: 'absolute' as const,
-                left: placement.col * (UNIT + GAP),
-                top: placement.row * (UNIT + GAP),
-              };
-
-            return (
-              <WidgetSlotIdContext.Provider key={widgetId} value={widgetId}>
-                <View style={absoluteStyle}>{child}</View>
-              </WidgetSlotIdContext.Provider>
-            );
-          })}
-        </View>
-      </ScrollView>
+      </View>
     </WidgetGridContext.Provider>
   );
 }
@@ -306,15 +309,19 @@ function GridContainer({ children, headerContent }: Props) {
 export default GridContainer;
 
 const styles = StyleSheet.create({
+  wrapper: { flex: 1 },
   scroll: { flex: 1 },
-  scrollContent: { paddingBottom: 32 },
+  scrollContent: { paddingTop: 60, paddingBottom: 32 },
   header: {
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 10,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: 8,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: '#2a2a2a',
+    backgroundColor: '#0b0b0f',
   },
   headerContent: {
     flex: 1,
@@ -340,7 +347,8 @@ const styles = StyleSheet.create({
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    paddingHorizontal: 12,
     alignItems: 'flex-start',
+    alignSelf: 'center',
+    width: GRID_COLUMNS * (UNIT + GAP),
   },
 });

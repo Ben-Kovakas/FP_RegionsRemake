@@ -2,7 +2,7 @@ import { ViewStyle } from 'react-native';
 
 export type WidgetSize = '1x1' | '2x1' | '1x2' | '2x2' | '2x4' | '4x2';
 
-export const GRID_COLUMNS = 2;
+export const GRID_COLUMNS = 4;
 export const UNIT = 80;
 export const GAP = 8;
 
