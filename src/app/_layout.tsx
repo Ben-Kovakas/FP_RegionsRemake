@@ -21,6 +21,8 @@ function ThemedStack() {
   return (
     <Stack>
       <Stack.Screen name="index" options={{ headerShown: false }} />
+      <Stack.Screen name="accessibilityHome/index" options={{ headerShown: false }} />
+      <Stack.Screen name="kidsHome/index" options={{ headerShown: false }} />
       <Stack.Screen name="transferScreen/index" options={{ ...neutralScreen, title: "Transfer Funds" }} />
       <Stack.Screen name="transferScreen/Success" options={{ ...neutralScreen, title: "Transfer Successful" }} />
       <Stack.Screen name="zelle/pay" options={{ ...neutralScreen, title: "Pay" }} />

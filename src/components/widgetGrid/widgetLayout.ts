@@ -1,6 +1,6 @@
 import { ViewStyle } from 'react-native';
 
-export type WidgetSize = '1x1' | '2x1' | '1x2' | '2x2' | '2x4' | '4x2';
+export type WidgetSize = '1x1' | '2x1' | '1x2' | '2x2' | '2x4' | '4x2' | '4x4';
 
 export const GRID_COLUMNS = 4;
 export const UNIT = 80;
@@ -25,6 +25,7 @@ export const WIDGET_CELL_SIZES: Record<WidgetSize, WidgetCellSize> = {
   '2x2': { cols: 2, rows: 2 },
   '2x4': { cols: 2, rows: 4 },
   '4x2': { cols: 4, rows: 2 },
+  '4x4': { cols: 4, rows: 4 },
 };
 
 export const WIDGET_PIXEL_SIZES: Record<WidgetSize, ViewStyle> = {
@@ -34,6 +35,7 @@ export const WIDGET_PIXEL_SIZES: Record<WidgetSize, ViewStyle> = {
   '2x2': { width: UNIT * 2 + GAP, height: UNIT * 2 + GAP },
   '2x4': { width: UNIT * 2 + GAP, height: UNIT * 4 + GAP * 3 },
   '4x2': { width: UNIT * 4 + GAP * 3, height: UNIT * 2 + GAP },
+  '4x4': { width: UNIT * 4 + GAP * 3, height: UNIT * 4 + GAP * 3 },
 };
 
 export function hasWidgetSize(value: string): value is WidgetSize {

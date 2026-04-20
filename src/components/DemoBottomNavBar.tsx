@@ -1,3 +1,4 @@
+import DashboardModeWizard from '@/components/wizard/DashboardModeWizard';
 import { Theme, useThemeControls } from '@/theme';
 import { Href, usePathname, useRouter } from 'expo-router';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -26,9 +27,15 @@ export default function DemoBottomNavBar() {
   const { theme, mode, toggleTheme } = useThemeControls();
   const styles = useMemo(() => makeStyles(theme), [theme]);
   const [activeHref, setActiveHref] = useState<string>('/');
+  const [wizardOpen, setWizardOpen] = useState(false);
 
   // Sync activeHref when pathname changes from external navigation (e.g. back button, deep link)
   useEffect(() => {
+    // Special dashboard modes aren't in DEMO_NAV_ITEMS; keep Main visually active for them.
+    if (pathname === '/accessibilityHome' || pathname === '/kidsHome') {
+      setActiveHref('/');
+      return;
+    }
     const match = DEMO_NAV_ITEMS.find((item) => {
       const route = String(item.href);
       if (route === '/') return pathname === '/';
@@ -59,10 +66,26 @@ export default function DemoBottomNavBar() {
             style={[styles.tab, isActive && styles.tabActive]}
             android_ripple={{ color: rippleColor, borderless: false }}
           >
-            <Text style={[styles.tabLabel, isActive && styles.tabLabelActive]}>{item.label}</Text>
+            <Text
+              style={[styles.tabLabel, isActive && styles.tabLabelActive]}
+              numberOfLines={1}
+              allowFontScaling={false}
+              ellipsizeMode="clip"
+            >
+              {item.label}
+            </Text>
           </Pressable>
         );
       })}
+      <Pressable
+        testID="demo-dashboard-wizard"
+        accessibilityLabel="Choose dashboard mode"
+        onPress={() => setWizardOpen(true)}
+        style={styles.themeToggle}
+        android_ripple={{ color: rippleColor, borderless: true }}
+      >
+        <Text style={styles.themeToggleIcon}>{'\u26A1'}</Text>
+      </Pressable>
       <Pressable
         testID="demo-theme-toggle"
         accessibilityLabel={isDark ? 'Switch to light theme' : 'Switch to dark theme'}
@@ -72,6 +95,7 @@ export default function DemoBottomNavBar() {
       >
         <Text style={styles.themeToggleIcon}>{isDark ? '\u2600' : '\u263E'}</Text>
       </Pressable>
+      <DashboardModeWizard visible={wizardOpen} onClose={() => setWizardOpen(false)} />
     </View>
   );
 }
@@ -85,9 +109,9 @@ function makeStyles(theme: Theme) {
       borderTopWidth: StyleSheet.hairlineWidth,
       borderTopColor: theme.colors.border,
       backgroundColor: theme.colors.surface,
-      paddingHorizontal: 8,
+      paddingHorizontal: 6,
       paddingTop: 8,
-      gap: 6,
+      gap: 3,
     },
     tab: {
       flex: 1,
@@ -95,7 +119,7 @@ function makeStyles(theme: Theme) {
       borderRadius: 10,
       alignItems: 'center',
       justifyContent: 'center',
-      paddingHorizontal: 4,
+      paddingHorizontal: 2,
     },
     tabActive: {
       backgroundColor: theme.colors.primarySoft,
