@@ -1,3 +1,4 @@
+import { useTheme } from '@/theme';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
@@ -9,6 +10,10 @@ type Props = {
 //it actually proved difficult to just import the logo as a png as it didn't really format properly
 //so I just made it from scratch lol
 export default function ZelleLogo({ compact = false, markOnly = false }: Props) {
+  const theme = useTheme();
+  // Zelle purple stays fixed; only the wordmark color tracks the theme so
+  // the "Zelle" text remains readable on both light and dark surfaces.
+  const wordmarkColor = theme.mode === 'dark' ? theme.colors.textPrimary : '#21142d';
   return (
     <View style={[styles.logo, compact && styles.logoCompact]}>
       <View style={[styles.mark, compact && styles.markCompact]}>
@@ -16,7 +21,13 @@ export default function ZelleLogo({ compact = false, markOnly = false }: Props) 
         <Text style={[styles.dollarText, compact && styles.dollarTextCompact]}>$</Text>
       </View>
       {!markOnly && (
-        <Text style={[styles.wordmark, compact && styles.wordmarkCompact]}>
+        <Text
+          style={[
+            styles.wordmark,
+            compact && styles.wordmarkCompact,
+            { color: wordmarkColor },
+          ]}
+        >
           Zelle
         </Text>
       )}
@@ -71,7 +82,6 @@ const styles = StyleSheet.create({
     fontSize: 7,
   },
   wordmark: {
-    color: '#21142d',
     fontSize: 18,
     fontWeight: '900',
   },

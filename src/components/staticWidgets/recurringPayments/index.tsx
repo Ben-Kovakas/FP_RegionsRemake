@@ -1,3 +1,4 @@
+import { Theme, useTheme } from '@/theme';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import WidgetShell from "../../widgetGrid/WidgetShell";
@@ -9,6 +10,8 @@ const payments = [
 ];
 
 function ProgressBar({ daysLeft, cycleDays }: { daysLeft: number; cycleDays: number }) {
+    const theme = useTheme();
+    const styles = React.useMemo(() => makeStyles(theme), [theme]);
     const progress = 1 - daysLeft / cycleDays;
     const urgent = daysLeft <= 3;
     return (
@@ -25,6 +28,8 @@ function ProgressBar({ daysLeft, cycleDays }: { daysLeft: number; cycleDays: num
 // ─── 2x1 ─────────────────────────────────────────────────────────────────────
 
 export function RecurringWidget2x1() {
+    const theme = useTheme();
+    const styles = React.useMemo(() => makeStyles(theme), [theme]);
     const next = payments[0];
     return (
         <WidgetShell size="2x1" onPress={() => console.log('tapped')}>
@@ -60,6 +65,8 @@ export function RecurringWidget2x1() {
 // ─── 2x2 ─────────────────────────────────────────────────────────────────────
 
 export function RecurringWidget2x2() {
+    const theme = useTheme();
+    const styles = React.useMemo(() => makeStyles(theme), [theme]);
     const total = payments.reduce((sum, p) => sum + p.amount, 0);
     return (
         <WidgetShell size="4x2" onPress={() => console.log('tapped')}>
@@ -93,127 +100,135 @@ export function RecurringWidget2x2() {
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#88bd40',
-        padding: 10,
-        justifyContent: 'center',
-        gap: 4,
-    },
-    row: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-    },
-    sectionLabel: {
-        fontSize: 10,
-        color: 'rgba(255,255,255,0.65)',
-    },
-    totalLabel: {
-        fontSize: 10,
-        fontWeight: '500',
-        color: '#ffffff',
-    },
-    urgentTag: {
-        fontSize: 10,
-        fontWeight: '500',
-        color: '#fff8e0',
-    },
-    paymentName: {
-        fontSize: 12,
-        fontWeight: '500',
-        color: '#ffffff',
-        flex: 1,
-        marginRight: 6,
-    },
-    paymentAmount: {
-        fontSize: 11,
-        fontWeight: '500',
-        color: '#ffffff',
-    },
+function makeStyles(theme: Theme) {
+    const onPrimary = theme.colors.onPrimary;
+    const onPrimaryMuted = theme.colors.onPrimaryMuted;
+    const softFill = 'rgba(255,255,255,0.18)';
+    const softFillWeak = 'rgba(255,255,255,0.12)';
+    const trackFill = '#f1ecb3';
+    const trackUrgent = '#fff176';
+    return StyleSheet.create({
+        container: {
+            flex: 1,
+            backgroundColor: theme.colors.primary,
+            padding: 10,
+            justifyContent: 'center',
+            gap: 4,
+        },
+        row: {
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+        },
+        sectionLabel: {
+            fontSize: 10,
+            color: onPrimaryMuted,
+        },
+        totalLabel: {
+            fontSize: 10,
+            fontWeight: '500',
+            color: onPrimary,
+        },
+        urgentTag: {
+            fontSize: 10,
+            fontWeight: '500',
+            color: '#fff8e0',
+        },
+        paymentName: {
+            fontSize: 12,
+            fontWeight: '500',
+            color: onPrimary,
+            flex: 1,
+            marginRight: 6,
+        },
+        paymentAmount: {
+            fontSize: 11,
+            fontWeight: '500',
+            color: onPrimary,
+        },
 
-    // Progress bar — red underline style
-    trackOuter: {
-        height: 3,
-        backgroundColor: 'rgba(255,255,255,0.15)',
-        overflow: 'hidden',
-        alignSelf: 'stretch',
-        marginTop: 1,
-    },
-    trackFill: {
-        height: 3,
-        backgroundColor: '#e6e0a3',
-    },
-    trackUrgent: {
-        backgroundColor: '#e4e82b',
-    },
+        // Progress bar track and fill
+        trackOuter: {
+            height: 3,
+            backgroundColor: softFillWeak,
+            overflow: 'hidden',
+            alignSelf: 'stretch',
+            marginTop: 1,
+        },
+        trackFill: {
+            height: 3,
+            backgroundColor: trackFill,
+        },
+        trackUrgent: {
+            backgroundColor: trackUrgent,
+        },
 
-    divider: {
-        height: 0.5,
-        backgroundColor: 'rgba(255,255,255,0.3)',
-        marginVertical: 2,
-    },
-    dividerThin: {
-        height: 0.5,
-        backgroundColor: 'rgba(255,255,255,0.15)',
-        marginVertical: 3,
-    },
+        divider: {
+            height: 0.5,
+            backgroundColor: 'rgba(255,255,255,0.3)',
+            marginVertical: 2,
+        },
+        dividerThin: {
+            height: 0.5,
+            backgroundColor: softFillWeak,
+            marginVertical: 3,
+        },
 
-    // Mini rows (2x1)
-    miniRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 4,
-    },
-    miniName: {
-        fontSize: 10,
-        color: 'rgba(255,255,255,0.75)',
-        width: 44,
-    },
-    miniDays: {
-        fontSize: 9,
-        color: 'rgba(255,255,255,0.55)',
-        width: 16,
-        textAlign: 'right',
-    },
-    miniTrackOuter: {
-        flex: 1,
-        height: 3,
-        backgroundColor: 'rgba(255,255,255,0.2)',
-        overflow: 'hidden',
-    },
-    miniTrackFill: {
-        height: '100%',
-        backgroundColor: '#e6e0a3',
-    },
-    miniAmount: {
-        fontSize: 10,
-        color: '#ffffff',
-        width: 42,
-        textAlign: 'right',
-    },
+        // Mini rows (2x1)
+        miniRow: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 4,
+        },
+        miniName: {
+            fontSize: 10,
+            color: onPrimaryMuted,
+            width: 44,
+        },
+        miniDays: {
+            fontSize: 9,
+            color: onPrimaryMuted,
+            width: 16,
+            textAlign: 'right',
+        },
+        miniTrackOuter: {
+            flex: 1,
+            height: 3,
+            backgroundColor: softFill,
+            overflow: 'hidden',
+        },
+        miniTrackFill: {
+            height: '100%',
+            backgroundColor: trackFill,
+        },
+        miniAmount: {
+            fontSize: 10,
+            color: onPrimary,
+            width: 42,
+            textAlign: 'right',
+        },
 
-    // 2x2 payment blocks
-    paymentList: {
-        flex: 0,
-        justifyContent: 'center',
-        gap: 0,
-    },
-    paymentBlock: {
-        gap: 0,
-        flexDirection: 'column',
-    },
-    daysLabel: {
-        fontSize: 9,
-        color: 'rgba(255,255,255,0.55)',
-    },
-    daysUrgent: {
-        color: '#fff176',
-    },
-    footerLabel: {
-        fontSize: 10,
-        color: 'rgba(255,255,255,0.55)',
-        textAlign: 'center',
-    },
-});
+        // 2x2 payment blocks
+        paymentList: {
+            flex: 0,
+            justifyContent: 'center',
+            gap: 0,
+        },
+        paymentBlock: {
+            gap: 0,
+            flexDirection: 'column',
+        },
+        daysLabel: {
+            fontSize: 9,
+            color: onPrimaryMuted,
+        },
+        daysUrgent: {
+            color: '#fff176',
+        },
+        footerLabel: {
+            fontSize: 10,
+            color: onPrimaryMuted,
+            textAlign: 'center',
+        },
+    });
+}

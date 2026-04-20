@@ -1,3 +1,4 @@
+import { Theme, useTheme } from '@/theme';
 import { useLocalSearchParams } from 'expo-router';
 import React from 'react';
 import {
@@ -20,13 +21,10 @@ import {
   zelleTransactions,
 } from './zelleData';
 import ZelleQrModal, { ZelleQrMode } from './ZelleQrModal';
-import { ZELLE_REGIONS_COLORS as COLORS } from './zelleTheme';
 
 type Props = {
   mode: 'pay' | 'request';
 };
-
-const CONTACT_AVATAR_PURPLE = '#6d1ed4';
 
 function getSingleParam(value: string | string[] | undefined) {
   if (Array.isArray(value)) {
@@ -58,6 +56,8 @@ function getResolvedContactId(contactId: string | undefined) {
 }
 
 function ContactAvatar({ contact }: { contact: ZelleContact }) {
+  const theme = useTheme();
+  const styles = React.useMemo(() => makeStyles(theme), [theme]);
   return (
     <View style={styles.avatar}>
       <Text style={styles.avatarText}>{contact.initials}</Text>
@@ -66,6 +66,8 @@ function ContactAvatar({ contact }: { contact: ZelleContact }) {
 }
 
 export default function ZelleTransferScreen({ mode }: Props) {
+  const theme = useTheme();
+  const styles = React.useMemo(() => makeStyles(theme), [theme]);
   const params = useLocalSearchParams();
   const transactionIdParam = getSingleParam(params.transactionId);
   const prefillTransaction = React.useMemo(
@@ -252,7 +254,7 @@ export default function ZelleTransferScreen({ mode }: Props) {
             value={query}
             onChangeText={setQuery}
             placeholder="Name, email, or phone"
-            placeholderTextColor={COLORS.muted}
+            placeholderTextColor={theme.colors.textMuted}
             style={styles.input}
           />
         </View>
@@ -314,7 +316,7 @@ export default function ZelleTransferScreen({ mode }: Props) {
             value={amount}
             onChangeText={setAmount}
             placeholder="$0.00"
-            placeholderTextColor={COLORS.muted}
+            placeholderTextColor={theme.colors.textMuted}
             keyboardType="decimal-pad"
             style={[styles.input, styles.amountInput]}
           />
@@ -323,7 +325,7 @@ export default function ZelleTransferScreen({ mode }: Props) {
             value={memo}
             onChangeText={setMemo}
             placeholder={isPay ? 'Dinner, rent, tickets' : 'What is this for?'}
-            placeholderTextColor={COLORS.muted}
+            placeholderTextColor={theme.colors.textMuted}
             style={styles.input}
           />
           {selectedContact && (
@@ -349,215 +351,218 @@ export default function ZelleTransferScreen({ mode }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: COLORS.pageBackground,
-  },
-  content: {
-    padding: 18,
-    paddingBottom: 36,
-    gap: 14,
-  },
-  header: {
-    gap: 4,
-  },
-  eyebrow: {
-    color: COLORS.secondaryAlt,
-    fontSize: 13,
-    fontWeight: '900',
-    textTransform: 'uppercase',
-  },
-  title: {
-    color: COLORS.heading,
-    fontSize: 32,
-    fontWeight: '900',
-  },
-  subtitle: {
-    color: COLORS.body,
-    fontSize: 15,
-    lineHeight: 21,
-  },
-  banner: {
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: COLORS.borderStrong,
-    backgroundColor: COLORS.surfaceTintStrong,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-  },
-  bannerText: {
-    color: COLORS.secondaryAlt,
-    fontSize: 13,
-    fontWeight: '800',
-    lineHeight: 18,
-  },
-  card: {
-    borderRadius: 8,
-    backgroundColor: COLORS.surface,
-    padding: 14,
-    gap: 10,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-  },
-  label: {
-    color: COLORS.secondaryAlt,
-    fontSize: 13,
-    fontWeight: '800',
-  },
-  input: {
-    minHeight: 44,
-    borderWidth: 1,
-    borderColor: COLORS.borderStrong,
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    color: COLORS.text,
-    backgroundColor: COLORS.surface,
-    fontSize: 15,
-  },
-  shortcutRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 10,
-  },
-  shortcutButton: {
-    flexGrow: 1,
-    flexBasis: 140,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: COLORS.borderStrong,
-    backgroundColor: COLORS.surfaceTint,
-    padding: 12,
-    gap: 4,
-  },
-  shortcutTitle: {
-    color: COLORS.secondaryAlt,
-    fontSize: 15,
-    fontWeight: '900',
-  },
-  shortcutCopy: {
-    color: COLORS.body,
-    fontSize: 12,
-    lineHeight: 16,
-  },
-  amountInput: {
-    fontSize: 24,
-    fontWeight: '900',
-  },
-  sectionTitle: {
-    color: COLORS.heading,
-    fontSize: 18,
-    fontWeight: '900',
-    marginTop: 4,
-  },
-  recentList: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 10,
-  },
-  recentCard: {
-    flexGrow: 1,
-    flexBasis: 150,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    backgroundColor: COLORS.surface,
-    padding: 12,
-    gap: 5,
-  },
-  selectedCard: {
-    borderColor: COLORS.primary,
-    backgroundColor: COLORS.surfaceTintStrong,
-  },
-  recentTitle: {
-    color: COLORS.heading,
-    fontSize: 14,
-    fontWeight: '900',
-  },
-  recentMeta: {
-    color: COLORS.body,
-    fontSize: 12,
-    lineHeight: 16,
-  },
-  recentAmount: {
-    color: COLORS.secondaryAlt,
-    fontSize: 16,
-    fontWeight: '900',
-  },
-  contactRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    borderRadius: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 6,
-  },
-  selectedContactRow: {
-    backgroundColor: COLORS.surfaceTint,
-  },
-  avatar: {
-    width: 42,
-    height: 42,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: CONTACT_AVATAR_PURPLE,
-  },
-  avatarText: {
-    color: '#ffffff',
-    fontWeight: '900',
-    fontSize: 14,
-  },
-  contactDetails: {
-    flex: 1,
-    minWidth: 0,
-  },
-  contactName: {
-    color: COLORS.heading,
-    fontSize: 15,
-    fontWeight: '900',
-  },
-  contactHandle: {
-    color: COLORS.body,
-    fontSize: 12,
-  },
-  contactNote: {
-    color: COLORS.muted,
-    fontSize: 12,
-    marginTop: 2,
-  },
-  favoriteLabel: {
-    color: COLORS.secondaryAlt,
-    fontSize: 11,
-    fontWeight: '900',
-  },
-  emptyText: {
-    color: COLORS.body,
-    fontSize: 14,
-  },
-  selectionCopy: {
-    color: COLORS.body,
-    fontSize: 13,
-    fontWeight: '700',
-  },
-  primaryButton: {
-    minHeight: 46,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: COLORS.secondary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: COLORS.primary,
-  },
-  primaryButtonText: {
-    color: COLORS.buttonText,
-    fontSize: 16,
-    fontWeight: '900',
-  },
-  confirmation: {
-    color: COLORS.secondaryAlt,
-    fontSize: 13,
-    fontWeight: '800',
-    lineHeight: 18,
-  },
-});
+function makeStyles(theme: Theme) {
+  return StyleSheet.create({
+    safeArea: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    content: {
+      padding: 18,
+      paddingBottom: 36,
+      gap: 14,
+    },
+    header: {
+      gap: 4,
+    },
+    eyebrow: {
+      color: theme.colors.primaryStrong,
+      fontSize: 13,
+      fontWeight: '900',
+      textTransform: 'uppercase',
+    },
+    title: {
+      color: theme.colors.textPrimary,
+      fontSize: 32,
+      fontWeight: '900',
+    },
+    subtitle: {
+      color: theme.colors.textSecondary,
+      fontSize: 15,
+      lineHeight: 21,
+    },
+    banner: {
+      borderRadius: 8,
+      borderWidth: 1,
+      borderColor: theme.colors.primary,
+      backgroundColor: theme.colors.primarySoft,
+      paddingHorizontal: 14,
+      paddingVertical: 12,
+    },
+    bannerText: {
+      color: theme.colors.primaryStrong,
+      fontSize: 13,
+      fontWeight: '800',
+      lineHeight: 18,
+    },
+    card: {
+      borderRadius: 8,
+      backgroundColor: theme.colors.surface,
+      padding: 14,
+      gap: 10,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+    },
+    label: {
+      color: theme.colors.primaryStrong,
+      fontSize: 13,
+      fontWeight: '800',
+    },
+    input: {
+      minHeight: 44,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      borderRadius: 8,
+      paddingHorizontal: 12,
+      color: theme.colors.textPrimary,
+      backgroundColor: theme.colors.surface,
+      fontSize: 15,
+    },
+    shortcutRow: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 10,
+    },
+    shortcutButton: {
+      flexGrow: 1,
+      flexBasis: 140,
+      borderRadius: 8,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      backgroundColor: theme.colors.surfaceMuted,
+      padding: 12,
+      gap: 4,
+    },
+    shortcutTitle: {
+      color: theme.colors.primaryStrong,
+      fontSize: 15,
+      fontWeight: '900',
+    },
+    shortcutCopy: {
+      color: theme.colors.textSecondary,
+      fontSize: 12,
+      lineHeight: 16,
+    },
+    amountInput: {
+      fontSize: 24,
+      fontWeight: '900',
+    },
+    sectionTitle: {
+      color: theme.colors.textPrimary,
+      fontSize: 18,
+      fontWeight: '900',
+      marginTop: 4,
+    },
+    recentList: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 10,
+    },
+    recentCard: {
+      flexGrow: 1,
+      flexBasis: 150,
+      borderRadius: 8,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      backgroundColor: theme.colors.surface,
+      padding: 12,
+      gap: 5,
+    },
+    selectedCard: {
+      borderColor: theme.colors.primary,
+      backgroundColor: theme.colors.primarySoft,
+    },
+    recentTitle: {
+      color: theme.colors.textPrimary,
+      fontSize: 14,
+      fontWeight: '900',
+    },
+    recentMeta: {
+      color: theme.colors.textSecondary,
+      fontSize: 12,
+      lineHeight: 16,
+    },
+    recentAmount: {
+      color: theme.colors.primaryStrong,
+      fontSize: 16,
+      fontWeight: '900',
+    },
+    contactRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 10,
+      borderRadius: 8,
+      paddingVertical: 8,
+      paddingHorizontal: 6,
+    },
+    selectedContactRow: {
+      backgroundColor: theme.colors.primarySoft,
+    },
+    avatar: {
+      width: 42,
+      height: 42,
+      borderRadius: 8,
+      alignItems: 'center',
+      justifyContent: 'center',
+      // Zelle brand purple for contact avatars — brand-fixed.
+      backgroundColor: theme.colors.zelleBrand,
+    },
+    avatarText: {
+      color: '#ffffff',
+      fontWeight: '900',
+      fontSize: 14,
+    },
+    contactDetails: {
+      flex: 1,
+      minWidth: 0,
+    },
+    contactName: {
+      color: theme.colors.textPrimary,
+      fontSize: 15,
+      fontWeight: '900',
+    },
+    contactHandle: {
+      color: theme.colors.textSecondary,
+      fontSize: 12,
+    },
+    contactNote: {
+      color: theme.colors.textMuted,
+      fontSize: 12,
+      marginTop: 2,
+    },
+    favoriteLabel: {
+      color: theme.colors.primaryStrong,
+      fontSize: 11,
+      fontWeight: '900',
+    },
+    emptyText: {
+      color: theme.colors.textSecondary,
+      fontSize: 14,
+    },
+    selectionCopy: {
+      color: theme.colors.textSecondary,
+      fontSize: 13,
+      fontWeight: '700',
+    },
+    primaryButton: {
+      minHeight: 46,
+      borderRadius: 8,
+      borderWidth: 1,
+      borderColor: theme.colors.primaryStrong,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: theme.colors.primary,
+    },
+    primaryButtonText: {
+      color: theme.colors.onPrimary,
+      fontSize: 16,
+      fontWeight: '900',
+    },
+    confirmation: {
+      color: theme.colors.primaryStrong,
+      fontSize: 13,
+      fontWeight: '800',
+      lineHeight: 18,
+    },
+  });
+}

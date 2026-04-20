@@ -1,3 +1,4 @@
+import { Theme, useTheme } from '@/theme';
 import { useRouter } from 'expo-router';
 import React from 'react';
 import { StyleSheet, Text, View, useWindowDimensions } from 'react-native';
@@ -12,6 +13,8 @@ const useScale = () => {
 };
 
 export function TransferWidget() {
+    const theme = useTheme();
+    const styles = React.useMemo(() => makeStyles(theme), [theme]);
     const router = useRouter();
     const s = useScale();
 
@@ -45,32 +48,35 @@ export function TransferWidget() {
     );
 }
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#88bd40',
-        padding: 6,
-    },
+function makeStyles(theme: Theme) {
+    return StyleSheet.create({
+        container: {
+            flex: 1,
+            backgroundColor: theme.colors.primary,
+            padding: 6,
+        },
 
-    iconWrapper: {
-        ...StyleSheet.absoluteFillObject,
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingBottom: 16
-    },
+        iconWrapper: {
+            ...StyleSheet.absoluteFillObject,
+            justifyContent: 'center',
+            alignItems: 'center',
+            paddingBottom: 16,
+        },
 
-    transferIcon: {
-        color: '#1A1A1A',
-        fontWeight: '600',
-    },
+        transferIcon: {
+            // Dark glyph on lime-green tile; intentional fixed contrast.
+            color: '#1A1F17',
+            fontWeight: '600',
+        },
 
-    transferLabel: {
-        position: 'absolute',
-        bottom: 8,
-        left: 4,
-        right: 4,
-        textAlign: 'center',
-        color: '#FFFFFF',
-        fontWeight: '700',
-    },
-});
+        transferLabel: {
+            position: 'absolute',
+            bottom: 8,
+            left: 4,
+            right: 4,
+            textAlign: 'center',
+            color: theme.colors.onPrimary,
+            fontWeight: '700',
+        },
+    });
+}

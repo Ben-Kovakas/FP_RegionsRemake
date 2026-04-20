@@ -2,19 +2,22 @@ import { BalanceWidget1x1, BalanceWidget2x1, BalanceWidget2x2 } from "@/componen
 import NotificationWidget2x1 from "@/components/staticWidgets/notifications";
 import { RecurringWidget2x1, RecurringWidget2x2 } from "@/components/staticWidgets/recurringPayments";
 import { Safe2SpendWidget1x1, Safe2SpendWidget2x1, Safe2SpendWidget2x2 } from "@/components/staticWidgets/safe2spend";
-import StockWidgetCompact from "@/components/stockWidget/StockWidgetCompact";
 import StockWidget1x1 from "@/components/stockWidget/StockWidget1x1";
+import StockWidgetCompact from "@/components/stockWidget/StockWidgetCompact";
 import StockWidgetFull from "@/components/stockWidget/StockWidgetFull";
 import { TransferWidget } from "@/components/transferWidgets/TransferWidget";
 import GridContainer from "@/components/widgetGrid/GridContainer";
 import WidgetGroup from "@/components/widgetGrid/WidgetGroup";
 import { ZelleActivityWidget, ZelleLogoWidget } from "@/components/zelle/ZelleWidget";
+import { useTheme } from "@/theme";
+import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 export default function Index() {
+  const theme = useTheme();
   return (
-    <View style={styles.container}>
-        <GridContainer headerContent={<Text style={styles.title}>My Dashboard</Text>}>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+        <GridContainer headerContent={<Text style={[styles.title, { color: theme.colors.textPrimary }]}>My Dashboard</Text>}>
           {/* Stock widgets */}
           <StockWidgetFull />
           <StockWidgetCompact />

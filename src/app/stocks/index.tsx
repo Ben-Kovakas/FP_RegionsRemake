@@ -1,7 +1,8 @@
+import { CHART_POINTS, MARKET_INDICES, STOCKS, StockData } from '@/components/stockWidget/stockData';
+import { Theme, useTheme } from '@/theme';
+import { useRouter } from 'expo-router';
 import React from 'react';
 import { FlatList, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { useRouter } from 'expo-router';
-import { CHART_POINTS, MARKET_INDICES, STOCKS, StockData } from '@/components/stockWidget/stockData';
 
 const allStocks = Object.values(STOCKS);
 
@@ -19,6 +20,8 @@ function formatVolume(num: number): string {
 
 /* ─── Mini sparkline bar chart ─── */
 function MiniChart({ color }: { color: string }) {
+  const theme = useTheme();
+  const styles = React.useMemo(() => makeStyles(theme), [theme]);
   const max = Math.max(...CHART_POINTS);
   const min = Math.min(...CHART_POINTS);
   const range = max - min || 1;
@@ -43,9 +46,11 @@ function MiniChart({ color }: { color: string }) {
 
 /* ─── Horizontal category card ─── */
 function CategoryCard({ stock, variant }: { stock: StockData; variant: 'active' | 'gainer' | 'loser' }) {
+  const theme = useTheme();
+  const styles = React.useMemo(() => makeStyles(theme), [theme]);
   const router = useRouter();
   const isPositive = stock.changePercent >= 0;
-  const changeColor = isPositive ? '#00C805' : '#FF5000';
+  const changeColor = isPositive ? theme.colors.success : theme.colors.danger;
   const changePrefix = isPositive ? '+' : '';
 
   return (
@@ -77,9 +82,11 @@ function CategoryCard({ stock, variant }: { stock: StockData; variant: 'active' 
 
 /* ─── All Stocks list row ─── */
 function StockRow({ stock }: { stock: StockData }) {
+  const theme = useTheme();
+  const styles = React.useMemo(() => makeStyles(theme), [theme]);
   const router = useRouter();
   const isPositive = stock.changePercent >= 0;
-  const changeColor = isPositive ? '#00C805' : '#FF5000';
+  const changeColor = isPositive ? theme.colors.success : theme.colors.danger;
   const changePrefix = isPositive ? '+' : '';
 
   return (
@@ -108,6 +115,8 @@ function StockRow({ stock }: { stock: StockData }) {
 
 /* ─── Main Screen ─── */
 export default function StocksScreen() {
+  const theme = useTheme();
+  const styles = React.useMemo(() => makeStyles(theme), [theme]);
   return (
     <View style={styles.root}>
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
@@ -118,7 +127,7 @@ export default function StocksScreen() {
         <View style={styles.indicesRow}>
           {MARKET_INDICES.map((idx) => {
             const isUp = idx.changePercent >= 0;
-            const color = isUp ? '#00C805' : '#FF5000';
+            const color = isUp ? theme.colors.success : theme.colors.danger;
             return (
               <View key={idx.name} style={styles.indexCard}>
                 <Text style={styles.indexName}>{idx.name}</Text>
@@ -151,7 +160,7 @@ export default function StocksScreen() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Top Gainers</Text>
-            <Text style={[styles.sectionSub, { color: '#00C805' }]}>Biggest price spike</Text>
+            <Text style={[styles.sectionSub, { color: theme.colors.success }]}>Biggest price spike</Text>
           </View>
           <FlatList
             data={topGainers.slice(0, 6)}
@@ -167,7 +176,7 @@ export default function StocksScreen() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Top Losers</Text>
-            <Text style={[styles.sectionSub, { color: '#FF5000' }]}>Biggest price drop</Text>
+            <Text style={[styles.sectionSub, { color: theme.colors.danger }]}>Biggest price drop</Text>
           </View>
           <FlatList
             data={topLosers.slice(0, 6)}
@@ -196,105 +205,111 @@ export default function StocksScreen() {
 }
 
 /* ─── Styles ─── */
-const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#0b0b0f' },
-  scroll: { flex: 1 },
-  scrollContent: { paddingTop: 60, paddingBottom: 40 },
+function makeStyles(theme: Theme) {
+  return StyleSheet.create({
+    root: { flex: 1, backgroundColor: theme.colors.background },
+    scroll: { flex: 1 },
+    scrollContent: { paddingTop: 60, paddingBottom: 40 },
 
-  title: {
-    fontSize: 32,
-    fontWeight: '800',
-    color: '#fff',
-    paddingHorizontal: 20,
-    marginBottom: 20,
-  },
+    title: {
+      fontSize: 32,
+      fontWeight: '800',
+      color: theme.colors.textPrimary,
+      paddingHorizontal: 20,
+      marginBottom: 20,
+    },
 
-  /* ── Market Indices ── */
-  indicesRow: {
-    flexDirection: 'row',
-    paddingHorizontal: 16,
-    gap: 8,
-    marginBottom: 28,
-  },
-  indexCard: {
-    flex: 1,
-    backgroundColor: '#16161e',
-    borderRadius: 12,
-    padding: 12,
-    alignItems: 'center',
-  },
-  indexName: { fontSize: 11, fontWeight: '600', color: '#888', marginBottom: 4 },
-  indexValue: { fontSize: 14, fontWeight: '700', color: '#fff', marginBottom: 2 },
-  indexChange: { fontSize: 12, fontWeight: '700' },
+    /* ── Market Indices ── */
+    indicesRow: {
+      flexDirection: 'row',
+      paddingHorizontal: 16,
+      gap: 8,
+      marginBottom: 28,
+    },
+    indexCard: {
+      flex: 1,
+      backgroundColor: theme.colors.surface,
+      borderRadius: 12,
+      padding: 12,
+      alignItems: 'center',
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: theme.colors.border,
+    },
+    indexName: { fontSize: 11, fontWeight: '600', color: theme.colors.textMuted, marginBottom: 4 },
+    indexValue: { fontSize: 14, fontWeight: '700', color: theme.colors.textPrimary, marginBottom: 2 },
+    indexChange: { fontSize: 12, fontWeight: '700' },
 
-  /* ── Sections ── */
-  section: { marginBottom: 28 },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'baseline',
-    paddingHorizontal: 20,
-    marginBottom: 12,
-  },
-  sectionTitle: { fontSize: 20, fontWeight: '800', color: '#fff' },
-  sectionSub: { fontSize: 12, color: '#666' },
+    /* ── Sections ── */
+    section: { marginBottom: 28 },
+    sectionHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'baseline',
+      paddingHorizontal: 20,
+      marginBottom: 12,
+    },
+    sectionTitle: { fontSize: 20, fontWeight: '800', color: theme.colors.textPrimary },
+    sectionSub: { fontSize: 12, color: theme.colors.textMuted },
 
-  /* ── Horizontal Category Cards ── */
-  catList: { paddingLeft: 20, paddingRight: 8, gap: 10 },
-  catCard: {
-    width: 148,
-    backgroundColor: '#16161e',
-    borderRadius: 14,
-    padding: 14,
-  },
-  catCardTop: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 4,
-  },
-  catTicker: { fontSize: 16, fontWeight: '800', color: '#fff' },
-  catBadge: {
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 6,
-  },
-  catBadgeText: { fontSize: 11, fontWeight: '700' },
-  catCompany: { fontSize: 11, color: '#666', marginBottom: 8 },
-  catPrice: { fontSize: 15, fontWeight: '700', color: '#fff', marginTop: 8 },
-  catVolume: { fontSize: 11, color: '#888', marginTop: 2 },
+    /* ── Horizontal Category Cards ── */
+    catList: { paddingLeft: 20, paddingRight: 8, gap: 10 },
+    catCard: {
+      width: 148,
+      backgroundColor: theme.colors.surface,
+      borderRadius: 14,
+      padding: 14,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: theme.colors.border,
+    },
+    catCardTop: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 4,
+    },
+    catTicker: { fontSize: 16, fontWeight: '800', color: theme.colors.textPrimary },
+    catBadge: {
+      paddingHorizontal: 6,
+      paddingVertical: 2,
+      borderRadius: 6,
+    },
+    catBadgeText: { fontSize: 11, fontWeight: '700' },
+    catCompany: { fontSize: 11, color: theme.colors.textMuted, marginBottom: 8 },
+    catPrice: { fontSize: 15, fontWeight: '700', color: theme.colors.textPrimary, marginTop: 8 },
+    catVolume: { fontSize: 11, color: theme.colors.textMuted, marginTop: 2 },
 
-  /* ── Mini Chart ── */
-  miniChart: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    height: 28,
-    gap: 1.5,
-  },
-  miniBarWrap: { flex: 1, justifyContent: 'flex-end' },
-  miniBar: { borderRadius: 1, minHeight: 1.5 },
+    /* ── Mini Chart ── */
+    miniChart: {
+      flexDirection: 'row',
+      alignItems: 'flex-end',
+      height: 28,
+      gap: 1.5,
+    },
+    miniBarWrap: { flex: 1, justifyContent: 'flex-end' },
+    miniBar: { borderRadius: 1, minHeight: 1.5 },
 
-  /* ── All Stocks Rows ── */
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 14,
-    paddingHorizontal: 20,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#1e1e2a',
-  },
-  rowLeft: { flex: 1 },
-  rowTicker: { fontSize: 16, fontWeight: '800', color: '#fff' },
-  rowCompany: { fontSize: 12, color: '#666', marginTop: 1 },
-  rowRight: { alignItems: 'flex-end', marginLeft: 12 },
-  rowPrice: { fontSize: 15, fontWeight: '700', color: '#fff' },
-  rowBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 6,
-    marginTop: 4,
-    minWidth: 64,
-    alignItems: 'center',
-  },
-  rowBadgeText: { fontSize: 12, fontWeight: '700', color: '#fff' },
-});
+    /* ── All Stocks Rows ── */
+    row: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingVertical: 14,
+      paddingHorizontal: 20,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: theme.colors.divider,
+    },
+    rowLeft: { flex: 1 },
+    rowTicker: { fontSize: 16, fontWeight: '800', color: theme.colors.textPrimary },
+    rowCompany: { fontSize: 12, color: theme.colors.textMuted, marginTop: 1 },
+    rowRight: { alignItems: 'flex-end', marginLeft: 12 },
+    rowPrice: { fontSize: 15, fontWeight: '700', color: theme.colors.textPrimary },
+    rowBadge: {
+      paddingHorizontal: 8,
+      paddingVertical: 3,
+      borderRadius: 6,
+      marginTop: 4,
+      minWidth: 64,
+      alignItems: 'center',
+    },
+    rowBadgeText: { fontSize: 12, fontWeight: '700', color: '#ffffff' },
+  });
+}

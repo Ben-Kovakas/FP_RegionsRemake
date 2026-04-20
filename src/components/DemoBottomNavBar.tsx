@@ -1,5 +1,6 @@
+import { Theme, useThemeControls } from '@/theme';
 import { Href, usePathname, useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -22,6 +23,8 @@ export default function DemoBottomNavBar() {
   const router = useRouter();
   const pathname = usePathname();
   const insets = useSafeAreaInsets();
+  const { theme, mode, toggleTheme } = useThemeControls();
+  const styles = useMemo(() => makeStyles(theme), [theme]);
   const [activeHref, setActiveHref] = useState<string>('/');
 
   // Sync activeHref when pathname changes from external navigation (e.g. back button, deep link)
@@ -37,6 +40,9 @@ export default function DemoBottomNavBar() {
     }
   }, [pathname]);
 
+  const rippleColor = theme.mode === 'dark' ? 'rgba(169,220,95,0.18)' : 'rgba(110,165,46,0.15)';
+  const isDark = mode === 'dark';
+
   return (
     <View style={[styles.bar, { paddingBottom: Math.max(insets.bottom, 8) }]} testID="demo-bottom-nav">
       {DEMO_NAV_ITEMS.map((item) => {
@@ -51,45 +57,70 @@ export default function DemoBottomNavBar() {
               router.replace(item.href);
             }}
             style={[styles.tab, isActive && styles.tabActive]}
-            android_ripple={{ color: 'rgba(54, 138, 74, 0.15)', borderless: false }}
+            android_ripple={{ color: rippleColor, borderless: false }}
           >
             <Text style={[styles.tabLabel, isActive && styles.tabLabelActive]}>{item.label}</Text>
           </Pressable>
         );
       })}
+      <Pressable
+        testID="demo-theme-toggle"
+        accessibilityLabel={isDark ? 'Switch to light theme' : 'Switch to dark theme'}
+        onPress={toggleTheme}
+        style={styles.themeToggle}
+        android_ripple={{ color: rippleColor, borderless: true }}
+      >
+        <Text style={styles.themeToggleIcon}>{isDark ? '\u2600' : '\u263E'}</Text>
+      </Pressable>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  bar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: '#d6e5da',
-    backgroundColor: '#f5faf6',
-    paddingHorizontal: 8,
-    paddingTop: 8,
-    gap: 6,
-  },
-  tab: {
-    flex: 1,
-    minHeight: 34,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 4,
-  },
-  tabActive: {
-    backgroundColor: '#dcefe2',
-  },
-  tabLabel: {
-    fontSize: 10,
-    fontWeight: '600',
-    color: '#5f7164',
-  },
-  tabLabelActive: {
-    color: '#256f38',
-  },
-});
+function makeStyles(theme: Theme) {
+  return StyleSheet.create({
+    bar: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      borderTopWidth: StyleSheet.hairlineWidth,
+      borderTopColor: theme.colors.border,
+      backgroundColor: theme.colors.surface,
+      paddingHorizontal: 8,
+      paddingTop: 8,
+      gap: 6,
+    },
+    tab: {
+      flex: 1,
+      minHeight: 34,
+      borderRadius: 10,
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingHorizontal: 4,
+    },
+    tabActive: {
+      backgroundColor: theme.colors.primarySoft,
+    },
+    tabLabel: {
+      fontSize: 10,
+      fontWeight: '600',
+      color: theme.colors.textSecondary,
+    },
+    tabLabelActive: {
+      color: theme.colors.primaryStrong,
+    },
+    themeToggle: {
+      minWidth: 34,
+      height: 34,
+      paddingHorizontal: 8,
+      borderRadius: 17,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: theme.colors.surfaceMuted,
+    },
+    themeToggleIcon: {
+      fontSize: 16,
+      lineHeight: 18,
+      color: theme.colors.textPrimary,
+    },
+  });
+}

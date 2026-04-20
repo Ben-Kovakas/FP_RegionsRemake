@@ -1,3 +1,4 @@
+import { Theme, useTheme } from '@/theme';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import WidgetShell from "../../widgetGrid/WidgetShell";
@@ -11,6 +12,8 @@ const accounts = [
 //1x1 — single account, name + balance centered in widget
 
 export function BalanceWidget1x1() {
+    const theme = useTheme();
+    const styles = React.useMemo(() => makeStyles(theme), [theme]);
     return (
         <WidgetShell size="1x1" onPress={() => console.log('tapped')}>
             <View style={styles.container1x1}>
@@ -24,6 +27,8 @@ export function BalanceWidget1x1() {
 //2x1 — list of accounts with balances
 
 export function BalanceWidget2x1() {
+    const theme = useTheme();
+    const styles = React.useMemo(() => makeStyles(theme), [theme]);
     return (
         <WidgetShell size="2x1" onPress={() => console.log('tapped')}>
             <View style={styles.container}>
@@ -48,6 +53,8 @@ const totalBalance = accounts.reduce((sum, acct) => {
 }, 0);
 
 export function BalanceWidget2x2() {
+    const theme = useTheme();
+    const styles = React.useMemo(() => makeStyles(theme), [theme]);
     return (
         <WidgetShell size="2x4" onPress={() => console.log('tapped')}>
             <View style={styles.container}>
@@ -79,112 +86,117 @@ export function BalanceWidget2x2() {
     );
 }
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 12,
-        justifyContent: 'center',
-        gap: 4,
-        backgroundColor: '#88bd40'
-    },
-    container1x1: {
-        flex: 1,
-        padding: 12,
-        justifyContent: 'center',
-        gap: 2,
-        backgroundColor: '#88bd40'
+function makeStyles(theme: Theme) {
+    const divider = 'rgba(255,255,255,0.35)';
+    return StyleSheet.create({
+        container: {
+            flex: 1,
+            padding: 12,
+            justifyContent: 'center',
+            gap: 4,
+            backgroundColor: theme.colors.primary,
+        },
+        container1x1: {
+            flex: 1,
+            padding: 12,
+            justifyContent: 'center',
+            gap: 2,
+            backgroundColor: theme.colors.primary,
+        },
 
-    },
+        // Account name
+        accountName: {
+            fontSize: 10,
+            color: theme.colors.onPrimary,
+            fontWeight: 'bold',
+        },
 
-    // Account name
-    accountName: {
-        fontSize: 10,
-        color: '#FFFFFF',
-        fontWeight: 'bold',
-    },
+        // Large balance (1x1). Dark text is intentional on the lime-green tile
+        // and stays constant across themes because the tile background itself
+        // doesn't swap.
+        balanceLarge: {
+            fontSize: 18,
+            fontWeight: '500',
+            color: '#1A1F17',
+            marginTop: 2,
+        },
 
-    // Large balance (1x1)
-    balanceLarge: {
-        fontSize: 18,
-        fontWeight: '500',
-        color: '#1A1A1A',
-        marginTop: 2,
-    },
+        // Small balance (2x1)
+        balanceSmall: {
+            fontSize: 12,
+            fontWeight: '500',
+            color: '#1A1F17',
+        },
+        negative: {
+            color: theme.colors.danger,
+        },
 
-    // Small balance (2x1)
-    balanceSmall: {
-        fontSize: 12,
-        fontWeight: '500',
-        color: '#1A1A1A',
-    },
-    negative: {
-        color: '#A32D2D',
-    },
+        // Row (2x1)
+        accountRow: {
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            paddingVertical: 3,
+        },
+        accountRowBorder: {
+            borderBottomWidth: 0.5,
+            borderBottomColor: divider,
+        },
 
-    // Row (2x1)
-    accountRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingVertical: 3,
-    },
-    accountRowBorder: {
-        borderBottomWidth: 0.5,
-        borderBottomColor: '#55893D',
-    },
+        // 2x2 total section
+        totalSection: {
+            gap: 2,
+        },
+        totalLabel: {
+            fontSize: 11,
+            fontWeight: 'bold',
+            color: theme.colors.onPrimary,
+        },
+        totalBalance: {
+            fontSize: 26,
+            fontWeight: 'bold',
+            color: '#1A1F17',
+        },
+        caption: {
+            fontSize: 11,
+            color: theme.colors.onPrimary,
+            marginTop: 2,
+        },
+        italic: {
+            fontStyle: 'italic',
+        },
+        bold: {
+            fontWeight: 'bold',
+        },
 
-    // 2x2 total section
-    totalSection: {
-        gap: 2,
-    },
-    totalLabel: {
-        fontSize: 11,
-        fontWeight: 'bold',
-        color: '#FFFFFF',
-    },
-    totalBalance: {
-        fontSize: 26,
-        fontWeight: 'bold',
-        color: '#1A1A1A',
-    },
-    caption: {
-        fontSize: 11,
-        color: '#FFFFFF',
-        marginTop: 2,
-    },
-    italic: {
-        fontStyle: 'italic',
-    },
-    bold: {
-        fontWeight: 'bold',
-    },
+        divider: {
+            height: 0.5,
+            backgroundColor: divider,
+            marginVertical: 8,
+        },
 
-    divider: {
-        height: 0.5,
-        backgroundColor: '#55893D',
-        marginVertical: 8,
-    },
-
-    // 2x2 account list
-    accountList: {
-        gap: 30,
-        flex: 1,
-        justifyContent: 'center',
-    },
-    accountRow2x2: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 6,
-    },
-    accountDot: {
-        width: 6,
-        height: 6,
-        borderRadius: 3,
-        backgroundColor: '#55893D',
-    },
-    accountName2x2: {
-        fontSize: 13,
-        color: '#FFFFFF',
-        flex: 1,
-    },
-});
+        // 2x2 account list
+        accountList: {
+            gap: 30,
+            flex: 1,
+            justifyContent: 'center',
+        },
+        accountRow2x2: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 6,
+        },
+        accountDot: {
+            width: 6,
+            height: 6,
+            borderRadius: 3,
+            // Darker lime so the dot reads on the primary fill in both themes.
+            backgroundColor: '#55893D',
+        },
+        accountName2x2: {
+            fontSize: 13,
+            color: theme.colors.onPrimary,
+            flex: 1,
+        },
+    });
+}

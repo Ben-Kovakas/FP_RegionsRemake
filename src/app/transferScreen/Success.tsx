@@ -1,10 +1,12 @@
-import React from 'react';
+import { Theme, useTheme } from '@/theme';
+import { useLocalSearchParams, useNavigation } from 'expo-router';
+import React, { useMemo } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { useRouter, useLocalSearchParams, useNavigation } from 'expo-router';
 
 export default function TransferSuccess() {
-  const router = useRouter();
+  const theme = useTheme();
+  const styles = useMemo(() => makeStyles(theme), [theme]);
   const navigation = useNavigation();
 
   const { from, to, amount } = useLocalSearchParams();
@@ -12,7 +14,7 @@ export default function TransferSuccess() {
   return (
     <View style={styles.container}>
       <View style={styles.checkmarkCircle}>
-          <Icon name="check" size={80} color="#ffffff" />
+          <Icon name="check" size={80} color={theme.colors.onPrimary} />
       </View>
       <Text style={styles.header}>Transfer Successful!</Text>
 
@@ -34,53 +36,59 @@ export default function TransferSuccess() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#ffffff',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 24
-  },
-  checkmark: {
-    fontSize: 80,
-    marginBottom: 24
-  },
-  checkmarkCircle: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: '#22c55e',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 24,
-  },
-  header: {
-    fontSize: 26,
-    fontWeight: 'bold',
-    color: '#16a34a', marginBottom: 32 },
-  details: {
-    width: '100%',
-    backgroundColor: '#dcfce7',
-    padding: 20,
-    borderRadius: 12,
-    marginBottom: 40
-  },
-  detailText: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#166534',
-    marginBottom: 8
-  },
-  button: {
-    backgroundColor: '#22c55e',
-    paddingVertical: 16,
-    paddingHorizontal: 32,
-    borderRadius: 12
-  },
-  buttonText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: 'bold'
-  },
-});
+function makeStyles(theme: Theme) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: 24,
+    },
+    checkmark: {
+      fontSize: 80,
+      marginBottom: 24,
+    },
+    checkmarkCircle: {
+      width: 120,
+      height: 120,
+      borderRadius: 60,
+      backgroundColor: theme.colors.primary,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: 24,
+    },
+    header: {
+      fontSize: 26,
+      fontWeight: 'bold',
+      color: theme.colors.primaryStrong,
+      marginBottom: 32,
+    },
+    details: {
+      width: '100%',
+      backgroundColor: theme.colors.surface,
+      padding: 20,
+      borderRadius: 12,
+      marginBottom: 40,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: theme.colors.border,
+    },
+    detailText: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: theme.colors.textPrimary,
+      marginBottom: 8,
+    },
+    button: {
+      backgroundColor: theme.colors.primary,
+      paddingVertical: 16,
+      paddingHorizontal: 32,
+      borderRadius: 12,
+    },
+    buttonText: {
+      color: theme.colors.onPrimary,
+      fontSize: 16,
+      fontWeight: 'bold',
+    },
+  });
+}

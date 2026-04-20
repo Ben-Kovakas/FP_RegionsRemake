@@ -7,6 +7,7 @@ import {
   View,
 } from 'react-native';
 
+import { Theme, useTheme } from '@/theme';
 import { placeWidgets } from './placeWidgets';
 import {
   WidgetGridContext,
@@ -94,6 +95,8 @@ function pickClosestWidget(
 
 function GridContainer({ children, headerContent }: Props) {
   // Content widgets stay opaque: this container only manages shell order and edit interactions.
+  const theme = useTheme();
+  const styles = React.useMemo(() => makeStyles(theme), [theme]);
   const childArray = React.useMemo(() => React.Children.toArray(children), [children]);
   const childEntries = React.useMemo(
     () => childArray.map((child, index) => ({ id: getWidgetId(child, index), child })),
@@ -308,47 +311,49 @@ function GridContainer({ children, headerContent }: Props) {
 
 export default GridContainer;
 
-const styles = StyleSheet.create({
-  wrapper: { flex: 1 },
-  scroll: { flex: 1 },
-  scrollContent: { paddingTop: 60, paddingBottom: 32 },
-  header: {
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 8,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: '#2a2a2a',
-    backgroundColor: '#0b0b0f',
-  },
-  headerContent: {
-    flex: 1,
-  },
-  editButton: {
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: '#8e8e8e',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-  },
-  editButtonActive: {
-    borderColor: '#4f8cff',
-    backgroundColor: 'rgba(79, 140, 255, 0.12)',
-  },
-  editButtonText: {
-    color: '#cfcfcf',
-    fontWeight: '600',
-  },
-  editButtonTextActive: {
-    color: '#8bb4ff',
-  },
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    alignItems: 'flex-start',
-    alignSelf: 'center',
-    width: GRID_COLUMNS * (UNIT + GAP),
-  },
-});
+function makeStyles(theme: Theme) {
+  return StyleSheet.create({
+    wrapper: { flex: 1, backgroundColor: theme.colors.background },
+    scroll: { flex: 1 },
+    scrollContent: { paddingTop: 60, paddingBottom: 32 },
+    header: {
+      paddingHorizontal: 16,
+      paddingVertical: 10,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      gap: 8,
+      borderTopWidth: StyleSheet.hairlineWidth,
+      borderTopColor: theme.colors.border,
+      backgroundColor: theme.colors.surface,
+    },
+    headerContent: {
+      flex: 1,
+    },
+    editButton: {
+      borderRadius: 999,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+    },
+    editButtonActive: {
+      borderColor: theme.colors.editAccent,
+      backgroundColor: theme.colors.editAccentSoft,
+    },
+    editButtonText: {
+      color: theme.colors.textSecondary,
+      fontWeight: '600',
+    },
+    editButtonTextActive: {
+      color: theme.colors.editAccentText,
+    },
+    grid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      alignItems: 'flex-start',
+      alignSelf: 'center',
+      width: GRID_COLUMNS * (UNIT + GAP),
+    },
+  });
+}

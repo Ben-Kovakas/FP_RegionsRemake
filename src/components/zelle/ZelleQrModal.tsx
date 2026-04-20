@@ -1,3 +1,4 @@
+import { Theme, useTheme } from '@/theme';
 import React from 'react';
 import {
   Modal,
@@ -27,6 +28,8 @@ export default function ZelleQrModal({
   onClose,
   onUseScannedContact,
 }: Props) {
+  const theme = useTheme();
+  const styles = React.useMemo(() => makeStyles(theme), [theme]);
   const scannedContact = getContactById(scannedContactId);
 
   if (mode == null) {
@@ -110,156 +113,162 @@ export default function ZelleQrModal({
   );
 }
 
-const styles = StyleSheet.create({
-  modalRoot: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 24,
-    backgroundColor: 'rgba(0, 0, 0, 0.45)',
-  },
-  sheet: {
-    width: '100%',
-    maxWidth: 360,
-    borderRadius: 8,
-    backgroundColor: '#ffffff',
-    padding: 18,
-    gap: 14,
-    shadowColor: '#000000',
-    shadowOpacity: 0.2,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 8,
-  },
-  title: {
-    color: '#21142d',
-    fontSize: 22,
-    fontWeight: '900',
-  },
-  subtitle: {
-    color: '#5b5363',
-    fontSize: 14,
-    lineHeight: 19,
-  },
-  codeCard: {
-    alignItems: 'center',
-    gap: 10,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#e2dce8',
-    backgroundColor: '#f7f6fb',
-    padding: 14,
-  },
-  accountName: {
-    color: '#21142d',
-    fontSize: 18,
-    fontWeight: '900',
-  },
-  accountHandle: {
-    color: '#5d5669',
-    fontSize: 13,
-    fontWeight: '700',
-  },
-  scanCard: {
-    gap: 12,
-  },
-  scannerFrame: {
-    height: 220,
-    borderRadius: 8,
-    backgroundColor: '#21142d',
-    alignItems: 'center',
-    justifyContent: 'center',
-    overflow: 'hidden',
-  },
-  corner: {
-    position: 'absolute',
-    width: 34,
-    height: 34,
-    borderColor: '#ffffff',
-  },
-  cornerTopLeft: {
-    top: 18,
-    left: 18,
-    borderTopWidth: 4,
-    borderLeftWidth: 4,
-  },
-  cornerTopRight: {
-    top: 18,
-    right: 18,
-    borderTopWidth: 4,
-    borderRightWidth: 4,
-  },
-  cornerBottomLeft: {
-    bottom: 18,
-    left: 18,
-    borderBottomWidth: 4,
-    borderLeftWidth: 4,
-  },
-  cornerBottomRight: {
-    right: 18,
-    bottom: 18,
-    borderRightWidth: 4,
-    borderBottomWidth: 4,
-  },
-  scanLine: {
-    width: '74%',
-    height: 2,
-    borderRadius: 2,
-    backgroundColor: '#a969ff',
-  },
-  scannerHint: {
-    position: 'absolute',
-    bottom: 24,
-    color: '#e8dffd',
-    fontSize: 13,
-    fontWeight: '700',
-  },
-  scanResult: {
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#e2dce8',
-    backgroundColor: '#f7f6fb',
-    padding: 12,
-    gap: 3,
-  },
-  resultLabel: {
-    color: '#6d1ed4',
-    fontSize: 12,
-    fontWeight: '900',
-    textTransform: 'uppercase',
-  },
-  resultName: {
-    color: '#21142d',
-    fontSize: 18,
-    fontWeight: '900',
-  },
-  resultMeta: {
-    color: '#5d5669',
-    fontSize: 13,
-    fontWeight: '700',
-  },
-  primaryButton: {
-    minHeight: 46,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#6d1ed4',
-  },
-  primaryButtonText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: '900',
-  },
-  secondaryButton: {
-    minHeight: 44,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#f2f0f6',
-  },
-  secondaryButtonText: {
-    color: '#352a40',
-    fontSize: 15,
-    fontWeight: '800',
-  },
-});
+function makeStyles(theme: Theme) {
+  return StyleSheet.create({
+    modalRoot: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: 24,
+      backgroundColor: 'rgba(0, 0, 0, 0.45)',
+    },
+    sheet: {
+      width: '100%',
+      maxWidth: 360,
+      borderRadius: 8,
+      backgroundColor: theme.colors.surfaceElevated,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      padding: 18,
+      gap: 14,
+      shadowColor: '#000000',
+      shadowOpacity: 0.2,
+      shadowRadius: 12,
+      shadowOffset: { width: 0, height: 6 },
+      elevation: 8,
+    },
+    title: {
+      color: theme.colors.textPrimary,
+      fontSize: 22,
+      fontWeight: '900',
+    },
+    subtitle: {
+      color: theme.colors.textSecondary,
+      fontSize: 14,
+      lineHeight: 19,
+    },
+    // Keep the QR "card" in Zelle-branded lavender so the code stays readable.
+    codeCard: {
+      alignItems: 'center',
+      gap: 10,
+      borderRadius: 8,
+      borderWidth: 1,
+      borderColor: '#e2dce8',
+      backgroundColor: theme.colors.zelleBrandSoft,
+      padding: 14,
+    },
+    accountName: {
+      color: theme.mode === 'dark' ? theme.colors.textPrimary : '#21142d',
+      fontSize: 18,
+      fontWeight: '900',
+    },
+    accountHandle: {
+      color: theme.mode === 'dark' ? theme.colors.textSecondary : '#5d5669',
+      fontSize: 13,
+      fontWeight: '700',
+    },
+    scanCard: {
+      gap: 12,
+    },
+    // Scanner frame is Zelle-brand dark purple regardless of theme.
+    scannerFrame: {
+      height: 220,
+      borderRadius: 8,
+      backgroundColor: '#21142d',
+      alignItems: 'center',
+      justifyContent: 'center',
+      overflow: 'hidden',
+    },
+    corner: {
+      position: 'absolute',
+      width: 34,
+      height: 34,
+      borderColor: '#ffffff',
+    },
+    cornerTopLeft: {
+      top: 18,
+      left: 18,
+      borderTopWidth: 4,
+      borderLeftWidth: 4,
+    },
+    cornerTopRight: {
+      top: 18,
+      right: 18,
+      borderTopWidth: 4,
+      borderRightWidth: 4,
+    },
+    cornerBottomLeft: {
+      bottom: 18,
+      left: 18,
+      borderBottomWidth: 4,
+      borderLeftWidth: 4,
+    },
+    cornerBottomRight: {
+      right: 18,
+      bottom: 18,
+      borderRightWidth: 4,
+      borderBottomWidth: 4,
+    },
+    scanLine: {
+      width: '74%',
+      height: 2,
+      borderRadius: 2,
+      backgroundColor: theme.colors.zelleBrandAccent,
+    },
+    scannerHint: {
+      position: 'absolute',
+      bottom: 24,
+      color: '#e8dffd',
+      fontSize: 13,
+      fontWeight: '700',
+    },
+    scanResult: {
+      borderRadius: 8,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      backgroundColor: theme.colors.zelleBrandSoft,
+      padding: 12,
+      gap: 3,
+    },
+    resultLabel: {
+      color: theme.colors.zelleBrand,
+      fontSize: 12,
+      fontWeight: '900',
+      textTransform: 'uppercase',
+    },
+    resultName: {
+      color: theme.mode === 'dark' ? theme.colors.textPrimary : '#21142d',
+      fontSize: 18,
+      fontWeight: '900',
+    },
+    resultMeta: {
+      color: theme.mode === 'dark' ? theme.colors.textSecondary : '#5d5669',
+      fontSize: 13,
+      fontWeight: '700',
+    },
+    primaryButton: {
+      minHeight: 46,
+      borderRadius: 8,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: theme.colors.zelleBrand,
+    },
+    primaryButtonText: {
+      color: '#ffffff',
+      fontSize: 16,
+      fontWeight: '900',
+    },
+    secondaryButton: {
+      minHeight: 44,
+      borderRadius: 8,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: theme.colors.surfaceMuted,
+    },
+    secondaryButtonText: {
+      color: theme.colors.textPrimary,
+      fontSize: 15,
+      fontWeight: '800',
+    },
+  });
+}

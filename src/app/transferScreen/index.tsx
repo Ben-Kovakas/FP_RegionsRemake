@@ -1,8 +1,9 @@
-import React, { useState, useMemo } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
-import DropDownPicker from 'react-native-dropdown-picker';
-import { Svg, Circle } from 'react-native-svg';
+import { Theme, useTheme } from '@/theme';
 import { useRouter } from 'expo-router';
+import React, { useMemo, useState } from 'react';
+import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import DropDownPicker from 'react-native-dropdown-picker';
+import { Circle, Svg } from 'react-native-svg';
 
 const accountBalances = {
   'Checking 3456': 1231,
@@ -15,6 +16,8 @@ const accountsList = [
 ];
 
 export default function TransferPage() {
+  const theme = useTheme();
+  const styles = useMemo(() => makeStyles(theme), [theme]);
   const [fromAccount, setFromAccount] = useState(null);
   const [toAccount, setToAccount] = useState(null);
   const [openFrom, setOpenFrom] = useState(false);
@@ -61,6 +64,10 @@ export default function TransferPage() {
           setValue={setFromAccount}
           style={styles.dropdown}
           dropDownContainerStyle={styles.dropdownContainer}
+          textStyle={{ color: theme.colors.textPrimary }}
+          ArrowDownIconComponent={() => <Text style={{ color: theme.colors.textSecondary }}>▾</Text>}
+          ArrowUpIconComponent={() => <Text style={{ color: theme.colors.textSecondary }}>▴</Text>}
+          TickIconComponent={() => <Text style={{ color: theme.colors.primaryStrong }}>✓</Text>}
         />
       </View>
 
@@ -74,6 +81,10 @@ export default function TransferPage() {
           setValue={setToAccount}
           style={styles.dropdown}
           dropDownContainerStyle={styles.dropdownContainer}
+          textStyle={{ color: theme.colors.textPrimary }}
+          ArrowDownIconComponent={() => <Text style={{ color: theme.colors.textSecondary }}>▾</Text>}
+          ArrowUpIconComponent={() => <Text style={{ color: theme.colors.textSecondary }}>▴</Text>}
+          TickIconComponent={() => <Text style={{ color: theme.colors.primaryStrong }}>✓</Text>}
         />
       </View>
 
@@ -82,6 +93,7 @@ export default function TransferPage() {
         <TextInput
           style={styles.input}
           placeholder="Enter amount"
+          placeholderTextColor={theme.colors.textMuted}
           keyboardType="numeric"
           value={amount}
           onChangeText={(text) => {
@@ -95,7 +107,7 @@ export default function TransferPage() {
             <View style={styles.circleWrapper}>
               <Svg width={CIRCLE_SIZE} height={CIRCLE_SIZE}>
                 <Circle
-                  stroke="#d1fae5"
+                  stroke={theme.colors.primarySoft}
                   fill="none"
                   cx={CIRCLE_SIZE / 2}
                   cy={CIRCLE_SIZE / 2}
@@ -103,7 +115,7 @@ export default function TransferPage() {
                   strokeWidth={STROKE_WIDTH}
                 />
                 <Circle
-                  stroke="#22c55e"
+                  stroke={theme.colors.primary}
                   fill="none"
                   cx={CIRCLE_SIZE / 2}
                   cy={CIRCLE_SIZE / 2}
@@ -128,78 +140,83 @@ export default function TransferPage() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-    backgroundColor: '#fff',
-  },
-  header: {
-    fontSize: 26,
-    fontWeight: 'bold',
-    marginBottom: 24,
-    color: '#16a34a',
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 8,
-    color: '#166534',
-  },
-  dropdown: {
-    backgroundColor: '#f0fdf4',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-  },
-  dropdownContainer: {
-    backgroundColor: '#dcfce7',
-  },
-  amountWrapper: {
-    marginTop: 16,
-    alignItems: 'center',
-    width: '100%',
-  },
-  input: {
-    backgroundColor: '#f0fdf4',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    fontSize: 18,
-    width: '100%',
-    textAlign: 'center',
-    borderWidth: 1,
-    borderColor: '#000',
-    marginBottom: 8,
-  },
-  balanceText: {
-    color: '#166534',
-    fontWeight: '600',
-    marginBottom: 16,
-  },
-  button: {
-    backgroundColor: '#22c55e',
-    paddingVertical: 14,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginTop: 16,
-    width: '100%',
-  },
-  buttonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  circleWrapper: {
-    width: 120,
-    height: 120,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginVertical: 16,
-  },
-  amountText: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#16a34a',
-    position: 'absolute',
-  },
-});
+function makeStyles(theme: Theme) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      padding: 16,
+      backgroundColor: theme.colors.background,
+    },
+    header: {
+      fontSize: 26,
+      fontWeight: 'bold',
+      marginBottom: 24,
+      color: theme.colors.primaryStrong,
+    },
+    label: {
+      fontSize: 16,
+      fontWeight: '600',
+      marginBottom: 8,
+      color: theme.colors.textSecondary,
+    },
+    dropdown: {
+      backgroundColor: theme.colors.surface,
+      borderRadius: 8,
+      paddingHorizontal: 12,
+      borderColor: theme.colors.border,
+    },
+    dropdownContainer: {
+      backgroundColor: theme.colors.surfaceElevated,
+      borderColor: theme.colors.border,
+    },
+    amountWrapper: {
+      marginTop: 16,
+      alignItems: 'center',
+      width: '100%',
+    },
+    input: {
+      backgroundColor: theme.colors.surface,
+      borderRadius: 8,
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      fontSize: 18,
+      width: '100%',
+      textAlign: 'center',
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      marginBottom: 8,
+      color: theme.colors.textPrimary,
+    },
+    balanceText: {
+      color: theme.colors.textSecondary,
+      fontWeight: '600',
+      marginBottom: 16,
+    },
+    button: {
+      backgroundColor: theme.colors.primary,
+      paddingVertical: 14,
+      borderRadius: 10,
+      alignItems: 'center',
+      marginTop: 16,
+      width: '100%',
+    },
+    buttonText: {
+      color: theme.colors.onPrimary,
+      fontWeight: 'bold',
+      fontSize: 16,
+    },
+    circleWrapper: {
+      width: 120,
+      height: 120,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginVertical: 16,
+    },
+    amountText: {
+      fontSize: 22,
+      fontWeight: 'bold',
+      color: theme.colors.primaryStrong,
+      position: 'absolute',
+    },
+  });
+}

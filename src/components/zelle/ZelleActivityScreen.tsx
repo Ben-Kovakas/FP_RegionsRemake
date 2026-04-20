@@ -1,3 +1,4 @@
+import { Theme, useTheme } from '@/theme';
 import { useLocalSearchParams } from 'expo-router';
 import React from 'react';
 import {
@@ -16,7 +17,6 @@ import {
   getSignedAmount,
   zelleTransactions,
 } from './zelleData';
-import { ZELLE_REGIONS_COLORS as COLORS } from './zelleTheme';
 
 function getSingleParam(value: string | string[] | undefined) {
   if (Array.isArray(value)) {
@@ -26,19 +26,21 @@ function getSingleParam(value: string | string[] | undefined) {
   return value;
 }
 
-function getAmountStyle(transaction: ZelleTransaction) {
+function getAmountColor(transaction: ZelleTransaction, theme: Theme) {
   if (transaction.kind === 'paid') {
-    return styles.amountPaid;
+    return theme.colors.danger;
   }
 
   if (transaction.kind === 'received') {
-    return styles.amountReceived;
+    return theme.colors.success;
   }
 
-  return styles.amountRequested;
+  return theme.colors.zelleBrand;
 }
 
 export default function ZelleActivityScreen() {
+  const theme = useTheme();
+  const styles = React.useMemo(() => makeStyles(theme), [theme]);
   const params = useLocalSearchParams();
   const highlightedTransactionId = getSingleParam(params.transactionId);
   const activityTransactions = zelleTransactions.filter((transaction) => transaction.kind !== 'requested');
@@ -86,7 +88,7 @@ export default function ZelleActivityScreen() {
                   <Text style={styles.activityStatus}>{transaction.status}</Text>
                 </View>
                 <View style={styles.amountColumn}>
-                  <Text style={[styles.amount, getAmountStyle(transaction)]}>
+                  <Text style={[styles.amount, { color: getAmountColor(transaction, theme) }]}>
                     {getSignedAmount(transaction)}
                   </Text>
                   <Text style={styles.kindLabel}>{transaction.kind}</Text>
@@ -100,131 +102,125 @@ export default function ZelleActivityScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#f2f4f8',
-  },
-  content: {
-    padding: 18,
-    paddingBottom: 36,
-    gap: 14,
-  },
-  header: {
-    gap: 4,
-  },
-  eyebrow: {
-    color: '#6d1ed4',
-    fontSize: 13,
-    fontWeight: '900',
-    textTransform: 'uppercase',
-  },
-  title: {
-    color: '#1f1728',
-    fontSize: 32,
-    fontWeight: '900',
-  },
-  subtitle: {
-    color: '#5e5668',
-    fontSize: 15,
-    lineHeight: 21,
-  },
-  summaryCard: {
-    borderRadius: 8,
-    backgroundColor: '#21142d',
-    padding: 16,
-    gap: 3,
-  },
-  summaryLabel: {
-    color: '#d9caef',
-    fontSize: 13,
-    fontWeight: '800',
-  },
-  summaryValue: {
-    color: '#ffffff',
-    fontSize: 24,
-    fontWeight: '900',
-  },
-  summaryMeta: {
-    color: '#c9bdd8',
-    fontSize: 13,
-    fontWeight: '700',
-  },
-  activityList: {
-    borderRadius: 8,
-    backgroundColor: '#ffffff',
-    borderWidth: 1,
-    borderColor: '#e4e0eb',
-    padding: 8,
-    gap: 6,
-  },
-  activityRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    borderRadius: 8,
-    padding: 8,
-    backgroundColor: '#ffffff',
-  },
-  activityRowHighlighted: {
-    borderWidth: 1,
-    borderColor: COLORS.primary,
-    backgroundColor: COLORS.surfaceTint,
-  },
-  avatar: {
-    width: 42,
-    height: 42,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#6d1ed4',
-  },
-  avatarText: {
-    color: '#ffffff',
-    fontWeight: '900',
-    fontSize: 14,
-  },
-  activityDetails: {
-    flex: 1,
-    minWidth: 0,
-  },
-  activityTitle: {
-    color: '#21142d',
-    fontSize: 14,
-    fontWeight: '900',
-  },
-  activityMeta: {
-    color: '#655c70',
-    fontSize: 12,
-    marginTop: 2,
-  },
-  activityStatus: {
-    color: '#7a7185',
-    fontSize: 11,
-    marginTop: 3,
-    fontWeight: '800',
-  },
-  amountColumn: {
-    alignItems: 'flex-end',
-    gap: 2,
-  },
-  amount: {
-    fontSize: 15,
-    fontWeight: '900',
-  },
-  amountPaid: {
-    color: '#8a2e2e',
-  },
-  amountReceived: {
-    color: '#2e6b3f',
-  },
-  amountRequested: {
-    color: '#6d1ed4',
-  },
-  kindLabel: {
-    color: '#7a7185',
-    fontSize: 11,
-    fontWeight: '800',
-    textTransform: 'capitalize',
-  },
-});
+function makeStyles(theme: Theme) {
+  return StyleSheet.create({
+    safeArea: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    content: {
+      padding: 18,
+      paddingBottom: 36,
+      gap: 14,
+    },
+    header: {
+      gap: 4,
+    },
+    eyebrow: {
+      color: theme.colors.zelleBrand,
+      fontSize: 13,
+      fontWeight: '900',
+      textTransform: 'uppercase',
+    },
+    title: {
+      color: theme.colors.textPrimary,
+      fontSize: 32,
+      fontWeight: '900',
+    },
+    subtitle: {
+      color: theme.colors.textSecondary,
+      fontSize: 15,
+      lineHeight: 21,
+    },
+    // Summary banner keeps the Zelle brand purple on purpose.
+    summaryCard: {
+      borderRadius: 8,
+      backgroundColor: '#21142d',
+      padding: 16,
+      gap: 3,
+    },
+    summaryLabel: {
+      color: '#d9caef',
+      fontSize: 13,
+      fontWeight: '800',
+    },
+    summaryValue: {
+      color: '#ffffff',
+      fontSize: 24,
+      fontWeight: '900',
+    },
+    summaryMeta: {
+      color: '#c9bdd8',
+      fontSize: 13,
+      fontWeight: '700',
+    },
+    activityList: {
+      borderRadius: 8,
+      backgroundColor: theme.colors.surface,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      padding: 8,
+      gap: 6,
+    },
+    activityRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 10,
+      borderRadius: 8,
+      padding: 8,
+      backgroundColor: theme.colors.surface,
+    },
+    activityRowHighlighted: {
+      borderWidth: 1,
+      borderColor: theme.colors.primary,
+      backgroundColor: theme.colors.primarySoft,
+    },
+    avatar: {
+      width: 42,
+      height: 42,
+      borderRadius: 8,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: theme.colors.zelleBrand,
+    },
+    avatarText: {
+      color: '#ffffff',
+      fontWeight: '900',
+      fontSize: 14,
+    },
+    activityDetails: {
+      flex: 1,
+      minWidth: 0,
+    },
+    activityTitle: {
+      color: theme.colors.textPrimary,
+      fontSize: 14,
+      fontWeight: '900',
+    },
+    activityMeta: {
+      color: theme.colors.textSecondary,
+      fontSize: 12,
+      marginTop: 2,
+    },
+    activityStatus: {
+      color: theme.colors.textMuted,
+      fontSize: 11,
+      marginTop: 3,
+      fontWeight: '800',
+    },
+    amountColumn: {
+      alignItems: 'flex-end',
+      gap: 2,
+    },
+    amount: {
+      fontSize: 15,
+      fontWeight: '900',
+    },
+    kindLabel: {
+      color: theme.colors.textMuted,
+      fontSize: 11,
+      fontWeight: '800',
+      textTransform: 'capitalize',
+    },
+  });
+}

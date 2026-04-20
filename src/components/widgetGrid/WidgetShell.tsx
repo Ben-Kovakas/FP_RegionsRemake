@@ -6,6 +6,7 @@ import {
   View,
 } from 'react-native';
 
+import { Theme, useTheme } from '@/theme';
 import {
   useWidgetGridContext,
   useWidgetGridParticipation,
@@ -33,6 +34,8 @@ export default function WidgetShell({
   transparentBackground = false,
 }: Props) {
   // Shell owns placement/edit affordances; children remain fully opaque widget content.
+  const theme = useTheme();
+  const styles = React.useMemo(() => makeStyles(theme), [theme]);
   const gridContext = useWidgetGridContext();
   const doesParticipateInGrid = useWidgetGridParticipation();
   const slotWidgetId = useWidgetSlotId();
@@ -157,73 +160,76 @@ export default function WidgetShell({
   );
 }
 
-const styles = StyleSheet.create({
-  base: {
-    margin: GAP / 2,
-    borderRadius: 12,
-    backgroundColor: '#1e1e1e',
-    overflow: 'visible',
-  },
-  transparentBackground: {
-    backgroundColor: 'transparent',
-  },
-  groupInnerBase: {
-    margin: 0,
-  },
-  groupInnerFill: {
-    flex: 1,
-    alignSelf: 'stretch',
-    minWidth: 0,
-    minHeight: 0,
-  },
-  baseEditMode: {
-    borderWidth: 1,
-    borderColor: '#4a4a4a',
-  },
-  selected: {
-    borderWidth: 2,
-    borderColor: '#4f8cff',
-  },
-  dragging: {
-    opacity: 0.85,
-    transform: [{ scale: 1.02 }],
-    zIndex: 20,
-    elevation: 20,
-  },
-  pressableArea: {
-    flex: 1,
-    margin: 2,
-    borderRadius: 10,
-  },
-  transparentPressableArea: {
-    margin: 0,
-    borderRadius: 0,
-  },
-  contentClip: {
-    flex: 1,
-    borderRadius: 10,
-    overflow: 'hidden',
-  },
-  transparentContentClip: {
-    borderRadius: 0,
-    overflow: 'visible',
-  },
-  dragHandle: {
-    position: 'absolute',
-    top: 6,
-    right: 6,
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    backgroundColor: 'rgba(20, 20, 20, 0.65)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  dragHandleGrip: {
-    width: 10,
-    height: 10,
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: '#e6e6e6',
-  },
-});
+function makeStyles(theme: Theme) {
+  return StyleSheet.create({
+    base: {
+      margin: GAP / 2,
+      borderRadius: 12,
+      backgroundColor: theme.colors.surface,
+      overflow: 'visible',
+    },
+    transparentBackground: {
+      backgroundColor: 'transparent',
+    },
+    groupInnerBase: {
+      margin: 0,
+    },
+    groupInnerFill: {
+      flex: 1,
+      alignSelf: 'stretch',
+      minWidth: 0,
+      minHeight: 0,
+    },
+    baseEditMode: {
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+    },
+    selected: {
+      borderWidth: 2,
+      borderColor: theme.colors.editAccent,
+    },
+    dragging: {
+      opacity: 0.85,
+      transform: [{ scale: 1.02 }],
+      zIndex: 20,
+      elevation: 20,
+    },
+    pressableArea: {
+      flex: 1,
+      margin: 2,
+      borderRadius: 10,
+    },
+    transparentPressableArea: {
+      margin: 0,
+      borderRadius: 0,
+    },
+    contentClip: {
+      flex: 1,
+      borderRadius: 10,
+      overflow: 'hidden',
+    },
+    transparentContentClip: {
+      borderRadius: 0,
+      overflow: 'visible',
+    },
+    dragHandle: {
+      position: 'absolute',
+      top: 6,
+      right: 6,
+      width: 22,
+      height: 22,
+      borderRadius: 11,
+      backgroundColor:
+        theme.mode === 'dark' ? 'rgba(20, 20, 20, 0.65)' : 'rgba(255, 255, 255, 0.75)',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    dragHandleGrip: {
+      width: 10,
+      height: 10,
+      borderRadius: 6,
+      borderWidth: 1,
+      borderColor: theme.colors.textPrimary,
+    },
+  });
+}
